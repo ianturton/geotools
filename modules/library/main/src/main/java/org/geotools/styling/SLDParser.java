@@ -52,6 +52,7 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.style.ContrastMethod;
 import org.opengis.util.InternationalString;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
@@ -1541,13 +1542,13 @@ public class SLDParser {
             }
 
             if (childName.equalsIgnoreCase("Normalize")) {
-                symbol.setNormalize();
+                symbol.setMethod(parseNormalize(child));
             } else if (childName.equalsIgnoreCase("Histogram")) {
-                symbol.setHistogram();
+                symbol.setMethod(new Histogram());
             } else if (childName.equalsIgnoreCase("Logarithmic")) {
-                symbol.setLogarithmic();
+                symbol.setMethod(new Logarithmic());
             } else if (childName.equalsIgnoreCase("Exponential")) {
-                symbol.setExponential();
+                symbol.setMethod(new Exponential());
             } else if (childName.equalsIgnoreCase("GammaValue")) {
                 try {
                     final String gammaString = getFirstChildValue(child);
@@ -1560,6 +1561,35 @@ public class SLDParser {
         }
 
         return symbol;
+    }
+
+    /**
+     * @return
+     */
+    private ContrastMethod parseNormalize(Node root) {
+        Normalize ret = new Normalize();
+        NodeList children = root.getChildNodes();
+        final int length = children.getLength();
+        for (int i = 0; i < length; i++) {
+            Node child = children.item(i);
+
+            if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+                continue;
+            }
+            String childName = child.getLocalName();
+            if (childName == null) {
+                childName = child.getNodeName();
+            }
+            if ("Parameter".equalsIgnoreCase(childName)) {
+                String key = child.getAttributes().getNamedItem("name").getLocalName();
+                Expression value = parseCssParameter(child);
+                ret.addParameter(key,value);
+            }
+            if("Algorithm".equalsIgnoreCase(childName)) {
+                ret.setAlgorithm(parseCssParameter(child));
+            }
+        }        
+        return ret;
     }
 
     /** Internal parse method - made protected for unit testing */

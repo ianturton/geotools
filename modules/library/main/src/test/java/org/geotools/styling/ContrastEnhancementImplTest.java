@@ -16,12 +16,13 @@
  */
 package org.geotools.styling;
 
-import junit.framework.TestCase;
 import org.geotools.factory.CommonFactoryFinder;
-import org.opengis.filter.expression.Literal;
+import org.geotools.styling.ContrastEnhancementImpl;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Literal;
 import org.opengis.style.ContrastMethod;
-import static org.junit.Assert.*;
+
+import junit.framework.TestCase;
 
 /**
  * The ContrastEnhancementImpl UnitTest
@@ -51,10 +52,12 @@ public class ContrastEnhancementImplTest extends TestCase {
      */
     public void testGetSetMethod() {
         System.out.println("setMethod");
-        ContrastMethod expected = ContrastMethod.HISTOGRAM;
+        ContrastMethod expected = new Histogram();
         ContrastEnhancementImpl contrastEnhancementImpl = new ContrastEnhancementImpl();
         contrastEnhancementImpl.setMethod(expected);
         ContrastMethod actual = contrastEnhancementImpl.getMethod();
         assertEquals(expected, actual);
     }
+    
+    
 }
