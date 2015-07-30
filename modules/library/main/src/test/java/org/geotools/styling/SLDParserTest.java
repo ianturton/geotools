@@ -16,9 +16,7 @@
  */
 package org.geotools.styling;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -31,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +38,9 @@ import junit.framework.Assert;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.junit.Test;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
+import org.opengis.style.ContrastMethod;
 import org.opengis.style.GraphicalSymbol;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -287,7 +289,24 @@ public class SLDParserTest {
 		"\n\t</CssParameter>" +
 		"</Stroke>";
 		
-
+    static String contrastEnhance = " <ContrastEnhancement> "  
+            + "\n\t<Normalize> "
+            + "\n\t<Algorithm>ClipToMinimumMaximum</Algorithm> "
+            + "\n\t<Parameter name=\"minValue\">1</Parameter>"
+            + "\n\t<Parameter name=\"maxValue\">27.0</Parameter>" 
+            + "\n\t</Normalize>"
+            + "\n\t</ContrastEnhancement>";
+    static String contrastEnhanceOther = " <ContrastEnhancement> "  
+            + "\n\t<METHOD/> "
+            + "\n\t</ContrastEnhancement>";
+    static String contrastEnhanceBroken = " <ContrastEnhancement> "  
+            + "\n\t<Normalize> "
+            + "\n\t<Algorithm/> "
+            + "\n\t<Parameter >1</Parameter>"
+            + "\n\t<Parameter name=\"maxValue\"/>" 
+            + "\n\t</Normalize>"
+            + "\n\t</ContrastEnhancement>";
+           
     static StyleFactory styleFactory = CommonFactoryFinder.getStyleFactory(null);
     
     @Test
@@ -454,6 +473,47 @@ public class SLDParserTest {
         Assert.assertEquals("#"+color,stroke.getColor().evaluate(Color.decode("#"+color)));
     }
     
+    @Test
+    public void testContrastEnhancement() throws Exception {
+        
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        org.w3c.dom.Document node = builder
+                .parse(new ByteArrayInputStream(contrastEnhance.getBytes()));
+        // First check the happy path for normalize
+        SLDParser parser = new SLDParser(styleFactory);
+        ContrastEnhancement ce = parser.parseContrastEnhancement(node.getDocumentElement());
+        ContrastMethod method = ce.getMethod();
+        assertNotNull(ce);
+        assertEquals("Wrong method type", "Normalize", method.getType().evaluate(null));
+        assertEquals("wrong Algorithm", "ClipToMinimumMaximum", method.getAlgorithm().evaluate(null));
+        Map<String, Expression> params = method.getParameters();
+        
+        assertEquals("Wrong number of parameters", 2, params.size());
+
+        assertEquals("wrong param returned", "1", params.get("minValue").evaluate(null));
+        assertEquals("wrong param returned", "27.0", params.get("maxValue").evaluate(null));
+        // check the other methods still work
+        for (String methodName : new String[] { "Normalize", "Logarithmic", "Exponential",
+                "Histogram" }) {
+            String target = contrastEnhanceOther.replace("METHOD", methodName);
+            node = builder.parse(new ByteArrayInputStream(target.getBytes()));
+            ce = parser.parseContrastEnhancement(node.getDocumentElement());
+            method=ce.getMethod();
+            assertNotNull(method);
+            assertEquals("Wrong method returned", methodName, method.getType().evaluate(null));
+
+        }
+        // now see what happens if we break things
+        node = builder.parse(new ByteArrayInputStream(contrastEnhanceBroken.getBytes()));
+        ce = parser.parseContrastEnhancement(node.getDocumentElement());
+        method=ce.getMethod();
+        assertNotNull(method);
+        assertNull("Algorithm set when it's not defined in SLD",method.getAlgorithm());
+        params = method.getParameters();
+        assertNotNull(params);
+        
+        assertTrue("Params should be empty", params.isEmpty());
+    }
     void assertStyles(Style[] styles) {
         assertEquals(1, styles.length);
         assertEquals("style", styles[0].getName());

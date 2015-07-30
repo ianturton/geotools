@@ -1581,8 +1581,13 @@ public class SLDParser {
                 childName = child.getNodeName();
             }
             if ("Parameter".equalsIgnoreCase(childName)) {
-                String key = child.getAttributes().getNamedItem("name").getLocalName();
+                
+                String key = getAttribute(child, "name");
+                if(key == null)
+                    continue;
                 Expression value = parseCssParameter(child);
+                if(value == null)
+                    continue;
                 ret.addParameter(key,value);
             }
             if("Algorithm".equalsIgnoreCase(childName)) {

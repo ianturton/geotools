@@ -16,11 +16,16 @@
  */
 package org.geotools.styling;
 
+import java.util.Map;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.styling.ContrastEnhancementImpl;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.style.ContrastMethod;
+
+import com.vividsolutions.jts.algorithm.NonRobustCGAlgorithms;
 
 import junit.framework.TestCase;
 
@@ -59,5 +64,22 @@ public class ContrastEnhancementImplTest extends TestCase {
         assertEquals(expected, actual);
     }
     
-    
+    public void testNormalize() {
+        Normalize normalize = new Normalize();
+        normalize.setAlgorithm(filterFactory.literal("ClipToMinimumMaximum"));
+        Map<String, Expression> params = normalize.getParameters();
+        assertNotNull("Null parameters returned by Normalize",params);
+        normalize.addParameter("min", filterFactory.literal(45.9));
+        params = normalize.getParameters();
+        assertEquals("Wrong number of parameters returned",1, params.size());
+        normalize.addParameter("max", filterFactory.function("env", 
+                filterFactory.literal("arg1"),
+                filterFactory.literal("arg2")));
+        params = normalize.getParameters();
+        
+        Expression max = params.get("max");
+        assertEquals("mangled the function in normalize","env([arg1], [arg2])", max.toString());
+        
+        
+    }
 }
