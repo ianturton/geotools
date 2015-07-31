@@ -99,10 +99,16 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
     public ContrastEnhancementImpl(org.opengis.style.ContrastEnhancement contrastEnhancement) {
         filterFactory = CommonFactoryFinder.getFilterFactory2(null);
         org.opengis.style.ContrastMethod meth = contrastEnhancement.getMethod();
-        if (meth.name().equalsIgnoreCase(NORMALIZE)) {
-            this.method = new Normalize(filterFactory);
-        } else if (meth.name().equalsIgnoreCase(HISTOGRAM)) {
-            this.method = new Histogram(filterFactory);
+        if (meth != null) {
+            if (NORMALIZE.equalsIgnoreCase(meth.name())) {
+                this.method = new Normalize(filterFactory);
+            } else if (HISTOGRAM.equalsIgnoreCase(meth.name())) {
+                this.method = new Histogram(filterFactory);
+            } else if (LOGARITHMIC.equalsIgnoreCase(meth.name())) {
+                this.method = new Logarithmic(filterFactory);
+            } else if (EXPONENTIAL.equalsIgnoreCase(meth.name())) {
+                this.method = new Exponential();
+            }
         }
         this.gamma = contrastEnhancement.getGammaValue();
     }

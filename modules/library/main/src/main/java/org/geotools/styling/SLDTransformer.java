@@ -1250,7 +1250,7 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(ContrastEnhancement ce) {
-            if (ce == null || ce.getMethod() == null)
+            if (ce == null )
                 return;
 
             start("ContrastEnhancement");
@@ -1258,11 +1258,7 @@ public class SLDTransformer extends TransformerBase {
             ContrastMethod method = ce.getMethod();
             if (method != null) {
                 visit(method);
-                String val = method.name();
-                val = val.substring(0, 1).toUpperCase() + val.substring(1).toLowerCase();
-                start(val);
-                // TODO IAN add handling for Algorithm & Parameters
-                end(val);
+
             }
 
             // gamma
@@ -1334,8 +1330,23 @@ public class SLDTransformer extends TransformerBase {
 
         @Override
         public void visit(ContrastMethod method) {
-            if(method!=null) {
-                //TODO IAN finish this method
+            if (method != null) {
+                String val = method.name();
+                val = val.substring(0, 1).toUpperCase() + val.substring(1).toLowerCase();
+                start(val);
+                Expression algorithm = method.getAlgorithm();
+                if (algorithm != null) {
+                    element("Algorithm", algorithm);
+                }
+                Map<String, Expression> params = method.getParameters();
+                if (params != null) {
+                    for (Entry<String, Expression> entry : params.entrySet()) {
+                        AttributesImpl atts = new AttributesImpl();
+                        atts.addAttribute("", "name", "name", "", entry.getKey());
+                        element("Parameter", entry.getValue().evaluate(null).toString(), atts);
+                    }
+                }
+                end(val);
             }
             
         }

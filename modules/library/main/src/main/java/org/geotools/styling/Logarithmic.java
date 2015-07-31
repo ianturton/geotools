@@ -16,7 +16,12 @@
  */
 package org.geotools.styling;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.filter.FilterFactory;
@@ -32,7 +37,16 @@ public class Logarithmic implements ContrastMethod {
 
     FilterFactory ff = CommonFactoryFinder.getFilterFactory2();
 
+    private Map<String, Expression> params;
+
+    private Expression algorithm;
+
     final static String NAME = "Logarithmic";
+
+    final static List<String> PARAM_NAMES = Arrays.asList("normalizationFactor", "normalizationFactor");
+
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.core");
 
     /**
     * 
@@ -65,8 +79,19 @@ public class Logarithmic implements ContrastMethod {
 
     @Override
     public Map<String, Expression> getParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        if (params == null)
+            params = new HashMap<String, Expression>();
+        return params;
+    }
+
+    public void addParameter(String key, Expression value) {
+        if (!PARAM_NAMES.contains(key)) {
+            LOGGER.log(Level.WARNING, "Adding unexpected parameter {0} to {1} Contrast Enhancer",
+                    new Object[] { key, NAME });
+        }
+        if (params == null)
+            params = new HashMap<String, Expression>();
+        params.put(key, value);
     }
 
     @Override
@@ -85,11 +110,21 @@ public class Logarithmic implements ContrastMethod {
         return ff;
     }
 
+
+
+    @Override
+    public void setAlgorithm(Expression name) {
+        this.algorithm = name;
+        
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result /*+ ((ff == null) ? 0 : ff.hashCode())*/;
+        result = prime * result + ((algorithm == null) ? 0 : algorithm.hashCode());
+        result = prime * result + ((ff == null) ? 0 : ff.hashCode());
+        result = prime * result + ((params == null) ? 0 : params.hashCode());
         return result;
     }
 
@@ -105,9 +140,28 @@ public class Logarithmic implements ContrastMethod {
             return false;
         }
         Logarithmic other = (Logarithmic) obj;
-        //TODO implement if we ever have fields
+        if (algorithm == null) {
+            if (other.algorithm != null) {
+                return false;
+            }
+        } else if (!algorithm.equals(other.algorithm)) {
+            return false;
+        }
+        if (ff == null) {
+            if (other.ff != null) {
+                return false;
+            }
+        } else if (!ff.equals(other.ff)) {
+            return false;
+        }
+        if (params == null) {
+            if (other.params != null) {
+                return false;
+            }
+        } else if (!params.equals(other.params)) {
+            return false;
+        }
         return true;
     }
-    
-    
+
 }

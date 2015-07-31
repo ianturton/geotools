@@ -74,4 +74,15 @@ public interface ContrastMethod {
      */
     public FilterFactory getFilterFactory();
 
+    /**
+     * @param key - the name of the parameter
+     * @param value - an expression that evaluates the parameter value
+     */
+    public void addParameter(String key, Expression value);
+
+    /**
+     * @param name - the name of the algorithm to use (if required)
+     */
+    public void setAlgorithm(Expression name);
+
 }

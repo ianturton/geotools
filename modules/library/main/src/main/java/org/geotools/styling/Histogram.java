@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.factory.CommonFactoryFinder;
@@ -25,12 +26,16 @@ import org.opengis.style.ContrastMethod;
 import org.opengis.style.StyleVisitor;
 
 /**
- * @author ian
+ * @author iant
  *
  */
 public class Histogram implements ContrastMethod {
 
     FilterFactory ff = CommonFactoryFinder.getFilterFactory2();
+
+    private Map<String, Expression> params;
+
+    private Expression algorithm;
 
     final static String NAME = "Histogram";
 
@@ -39,11 +44,11 @@ public class Histogram implements ContrastMethod {
     }
 
     public Histogram(ContrastMethod method) {
-        if(!(method instanceof Histogram)) {
-            throw new RuntimeException("tried to construct Histogram with "+method.getClass());
+        if (!(method instanceof Histogram)) {
+            throw new RuntimeException("tried to construct Histogram with " + method.getClass());
         }
         ff = method.getFilterFactory();
-        
+
     }
 
     /**
@@ -87,10 +92,27 @@ public class Histogram implements ContrastMethod {
     }
 
     @Override
+    public void addParameter(String key, Expression value) {
+        if (this.params == null) {
+            params = new HashMap<String, Expression>();
+        }
+        this.params.put(key, value);
+
+    }
+
+    @Override
+    public void setAlgorithm(Expression name) {
+        this.algorithm = name;
+
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result /*+ ((ff == null) ? 0 : ff.hashCode())*/;
+        result = prime * result + ((algorithm == null) ? 0 : algorithm.hashCode());
+        result = prime * result + ((ff == null) ? 0 : ff.hashCode());
+        result = prime * result + ((params == null) ? 0 : params.hashCode());
         return result;
     }
 
@@ -106,9 +128,28 @@ public class Histogram implements ContrastMethod {
             return false;
         }
         Histogram other = (Histogram) obj;
-        //TODO Implement if we ever have fields
+        if (algorithm == null) {
+            if (other.algorithm != null) {
+                return false;
+            }
+        } else if (!algorithm.equals(other.algorithm)) {
+            return false;
+        }
+        if (ff == null) {
+            if (other.ff != null) {
+                return false;
+            }
+        } else if (!ff.equals(other.ff)) {
+            return false;
+        }
+        if (params == null) {
+            if (other.params != null) {
+                return false;
+            }
+        } else if (!params.equals(other.params)) {
+            return false;
+        }
         return true;
     }
 
-    
 }
