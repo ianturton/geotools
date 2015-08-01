@@ -589,33 +589,16 @@
 			<xsd:choice minOccurs="0">
 				<xsd:element ref="se:Normalize"/>
 				<xsd:element ref="se:Histogram"/>
-				<xsd:element ref="se:Logarithmic"/>
-				<xds:element ref="se:Exponential"/>
 			</xsd:choice>
 			<xsd:element ref="se:GammaValue" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="Normalize" type="se:ContrastMethodType">
+	<xsd:element name="Normalize" type="se:NormalizeType">
 	</xsd:element>
-	<xsd:complexType name="ContrastMethodType">
-		<xsd:sequence>
-			<xsd:element name="Algorithm" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-			<xsd:sequence>
-			<xsd:element name="Parameter" type="se:ParameterType" minOccurs="0"/>
-            </xsd:sequence>
-		</xsd:sequence>
-	</xsd:complexType>
-	<xsd:complexType name="ParameterType">
-	   <xsd:simpleContent>
-	       <xsd:extension base="xsd:anySimpleType">
-	       <xsd:attribute name="name" type="xsd:string" use="required"/>
-	       </xsd:extension>
-	   </xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:element name="Histogram" type="se:ContrastMethodType">
+	<xsd:complexType name="NormalizeType"/>
+	<xsd:element name="Histogram" type="se:HistogramType">
 	</xsd:element>
-	<xsd:element name="Logarithmic" type="se:ContrastMethodType"/>
-	<xsd:element name="Exponential" type="se:ContrastMethodType"/>
+	<xsd:complexType name="HistogramType"/>
 	<xsd:element name="GammaValue" type="xsd:double"/>
 	<xsd:element name="ShadedRelief" type="se:ShadedReliefType">
 		<xsd:annotation>
