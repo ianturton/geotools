@@ -114,7 +114,9 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
     public ContrastEnhancementImpl(org.opengis.style.ContrastEnhancement contrastEnhancement) {
         filterFactory = CommonFactoryFinder.getFilterFactory2(null);
         org.opengis.style.ContrastMethod meth = contrastEnhancement.getMethod();
-        lookupMethod(meth.name(),filterFactory);
+        if(meth != null) {
+            lookupMethod(meth.name(),filterFactory);
+        }
         this.gamma = contrastEnhancement.getGammaValue();
     }
 
