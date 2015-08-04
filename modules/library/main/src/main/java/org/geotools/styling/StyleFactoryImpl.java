@@ -750,7 +750,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
         return ce;
     }
-
+    
+    
     public SelectedChannelType createSelectedChannelType(String name,
         ContrastEnhancement enhancement) {
         SelectedChannelType sct = new SelectedChannelTypeImpl(filterFactory);
