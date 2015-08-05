@@ -20,6 +20,8 @@ import org.opengis.filter.FilterFactory;
 import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
 import org.geotools.styling.ContrastEnhancement;
+import org.geotools.styling.Histogram;
+import org.geotools.styling.Normalize;
 import org.geotools.styling.StyleFactory;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -115,18 +117,20 @@ public class SLDContrastEnhancementBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         ContrastEnhancement ce = styleFactory.createContrastEnhancement();
-
+System.out.println("parsing ContrastEnhancement");
         if (node.getChildValue("GammaValue") != null) {
             Double gamma = (Double) node.getChildValue("GammaValue");
             ce.setGammaValue(filterFactory.literal(gamma.doubleValue()));
         }
 
         if (node.getChild("Normalize") != null) {
-            ce.setNormalize();
-        } else {
-            if (node.getChild("Histogram") != null) {
-                ce.setHistogram();
-            }
+            SLDNormalizeBinding binding = new SLDNormalizeBinding(styleFactory,filterFactory);
+            Node child = node.getChild("Normalize");
+            ce.setMethod((Normalize)binding.parse(instance, child, value));
+        } else if (node.getChild("Histogram") != null) {
+            SLDHistogramBinding binding = new SLDHistogramBinding();
+            Node child = node.getChild("Histogram");
+            ce.setMethod((Histogram)binding.parse(instance, child, value));
         }
 
         return ce;
