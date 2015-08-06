@@ -118,7 +118,7 @@ public class SLDContrastEnhancementBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         ContrastEnhancement ce = styleFactory.createContrastEnhancement();
-System.out.println("parsing ContrastEnhancement");
+
         if (node.getChildValue("GammaValue") != null) {
             Double gamma = (Double) node.getChildValue("GammaValue");
             ce.setGammaValue(filterFactory.literal(gamma.doubleValue()));

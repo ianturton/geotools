@@ -64,7 +64,13 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
     public ContrastEnhancementBuilder histogram(String contrastAlgorithm, String[] constrastParameters) {
         return contrastMethod("histogram", contrastAlgorithm, constrastParameters);
     }
+    public ContrastEnhancementBuilder exponential(String contrastAlgorithm, String[] constrastParameters) {
+        return contrastMethod("exponential", contrastAlgorithm, constrastParameters);
+    }
 
+    public ContrastEnhancementBuilder logarithmic(String contrastAlgorithm, String[] constrastParameters) {
+        return contrastMethod("logarithm", contrastAlgorithm, constrastParameters);
+    }
     private ContrastEnhancementBuilder contrastMethod(String name, String algorithm, String[] parameters) {
         if ("histogram".equals(name)) {
             this.method = ContrastMethod.HISTOGRAM;
@@ -137,5 +143,7 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
         // TODO Auto-generated method stub
         return normalize(null,null);
     }
+
+    
 
 }
