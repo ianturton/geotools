@@ -30,7 +30,7 @@ import org.opengis.filter.expression.Expression;
 public abstract class AbstractContrastEnhancementMethod extends ContrastEnhancementMethod {
 
     /** ALGORITHM */
-    private static final String ALGORITHM = "Algorithm";
+    private static final String ALGORITHM = "algorithm";
 
     protected FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory2();
     
