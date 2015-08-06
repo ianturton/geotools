@@ -173,43 +173,8 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         visitor.visit(this);
     }
 
-    @Override
-    public int hashCode() {
-        final int PRIME = 1000003;
-        int result = 0;
-
-        if (gamma != null) {
-            result = (PRIME * result) + gamma.hashCode();
-        }
-
-        /*if (getType() != null) {
-            result = (PRIME * result) + getType().hashCode();
-        }
-*/
-        if (getMethod() != null) {
-            result = (PRIME * result) + getMethod().hashCode();
-        }
-
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj instanceof ContrastEnhancementImpl) {
-            ContrastEnhancementImpl other = (ContrastEnhancementImpl) obj;
-
-            return Utilities.equals(gamma, other.gamma)
-                    //&& Utilities.equals(getType(), other.getType())
-                    && Utilities.equals(getMethod(), other.getMethod());
-        }
-
-        return false;
-    }
-
+    
+    
     static ContrastEnhancementImpl cast(org.opengis.style.ContrastEnhancement enhancement) {
         if (enhancement == null) {
             return null;
@@ -276,4 +241,60 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         
         
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((gamma == null) ? 0 : gamma.hashCode());
+        result = prime * result + ((method == null) ? 0 : method.hashCode());
+        result = prime * result + ((options == null) ? 0 : options.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof ContrastEnhancementImpl)) {
+            return false;
+        }
+        ContrastEnhancementImpl other = (ContrastEnhancementImpl) obj;
+        if (gamma == null) {
+            if (other.gamma != null) {
+                return false;
+            }
+        } else if (!gamma.equals(other.gamma)) {
+            return false;
+        }
+        if (method == null) {
+            if (other.method != null) {
+                return false;
+            }
+        } else if (!method.equals(other.method)) {
+            return false;
+        }
+        if (options == null) {
+            if (other.options != null) {
+                return false;
+            }
+        } else if (!options.equals(other.options)) {
+            return false;
+        }
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }

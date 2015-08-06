@@ -20,10 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.styling.ContrastEnhancement;
-import org.geotools.styling.Exponential;
-import org.geotools.styling.Histogram;
-import org.geotools.styling.Logarithmic;
-import org.geotools.styling.Normalize;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.ContrastMethod;
 
@@ -84,12 +80,12 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
             throw new IllegalArgumentException("Unexpected ContrastEnhamcement method " + name);
         }
         if (algorithm != null && !algorithm.isEmpty()) {
-            System.out.println("setting "+algorithm);
+            
             this.options.put("algorithm",FF.literal(algorithm));
         }
         if (parameters!=null) {
             for(int i=0;i<parameters.length;i+=2) {
-                System.out.println("adding parameter "+parameters[i]+"="+parameters[i+1]);
+               
                 this.options.put(parameters[i], FF.literal(parameters[i+1]));
             }
         }
@@ -105,6 +101,8 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
             return null;
         }
         ContrastEnhancement contrastEnhancement = sf.contrastEnhancement(gamma, method);
+        contrastEnhancement.setOptions(options);
+        
         return contrastEnhancement;
     }
 
@@ -121,6 +119,7 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
         }
         gamma = contrastEnhancement.getGammaValue();
         method = contrastEnhancement.getMethod();
+        options = contrastEnhancement.getOptions();
         unset = false;
         return this;
     }
@@ -136,13 +135,7 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
 
     }
 
-    /**
-     * @return
-     */
-    public ContrastEnhancementBuilder normalize() {
-        // TODO Auto-generated method stub
-        return normalize(null,null);
-    }
+    
 
     
 
