@@ -18,6 +18,9 @@
  */
 package org.geotools.styling;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.util.Utilities;
 import org.opengis.filter.FilterFactory;
@@ -71,6 +74,10 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
 
     private ContrastMethod method;
 
+    private Expression type;
+
+    private Map<String, Expression> options;
+
     public ContrastEnhancementImpl() {
         this(CommonFactoryFinder.getFilterFactory(null));
     }
@@ -79,13 +86,13 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         this(factory, (ContrastMethod)null);
     }
 
-    public ContrastEnhancementImpl(FilterFactory factory, String method) {
+    /*public ContrastEnhancementImpl(FilterFactory factory, String method) {
         filterFactory = factory;
         lookupMethod(method);
-    }
-    private void lookupMethod(String method) {
+    }*/
+    /*private void lookupMethod(String method) {
         lookupMethod(method,null);
-    }
+    }*/
     /**
      * @param method
      * @param filterFactory2 
@@ -94,16 +101,16 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         if(ff==null) {
             ff=CommonFactoryFinder.getFilterFactory();
         }
-        if (ContrastMethod.NORMALIZE.equalsIgnoreCase(method)) {
-            this.method = new Normalize(ff);
-        } else if (ContrastMethod.EXPONENTIAL.equalsIgnoreCase(method)) {
-            this.method = new Exponential(ff);
-        } else if (ContrastMethod.LOGARITHMIC.equalsIgnoreCase(method)) {
-            this.method = new Logarithmic(ff);
-        } else if (ContrastMethod.HISTOGRAM.equalsIgnoreCase(method)) {
-            this.method = new Histogram(ff);
+        if (ContrastMethod.NORMALIZE.matches(method)) {
+            this.method = ContrastMethod.NORMALIZE;
+        } else if (ContrastMethod.EXPONENTIAL.matches(method)) {
+            this.method = ContrastMethod.EXPONENTIAL;
+        } else if (ContrastMethod.LOGARITHMIC.matches(method)) {
+            this.method = ContrastMethod.LOGARITHMIC;
+        } else if (ContrastMethod.HISTOGRAM.matches(method)) {
+            this.method = ContrastMethod.HISTOGRAM;
         } else {
-            this.method = null;
+            this.method = ContrastMethod.NONE;
         }
     }
 
@@ -120,11 +127,11 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         this.gamma = contrastEnhancement.getGammaValue();
     }
 
-    public ContrastEnhancementImpl(FilterFactory2 factory, Expression gamma,
+    /*public ContrastEnhancementImpl(FilterFactory2 factory, Expression gamma,
             String method) {
         lookupMethod(method, factory);
         this.gamma = gamma;
-    }
+    }*/
     public ContrastEnhancementImpl(FilterFactory2 factory, Expression gamma,
             ContrastMethod method) {
         this.filterFactory = factory;
@@ -141,57 +148,25 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         return gamma;
     }
 
-    public Expression getType() {
-        if (method != null) {
-            return method.getType();
-        } else {
-            return null;
-        }
-    }
+    /*public Expression getType() {
+        return type;
+    }*/
 
     public void setGammaValue(Expression gamma) {
         this.gamma = gamma;
     }
 
-    public void setHistogram() {
-
-        method = new Histogram();
-
+    
+   /* public void setType(Expression type) {
+        this.type = type;
     }
-
-    public void setNormalize() {
-
-        method = new Normalize();
-
-    }
-
-    public void setLogarithmic() {
-
-        method = new Logarithmic();
-
-    }
-
-    public void setExponential() {
-        method = new Exponential();
-
-    }
-
-    public void setType(Expression type) {
-
-        if (type instanceof Literal) {
-            String value = type.evaluate(null, String.class);
-            lookupMethod(value);
-        } else {
-            method = null;
-        }
-    }
-
+*/
     public ContrastMethod getMethod() {
         return method;
     }
 
     public Object accept(org.opengis.style.StyleVisitor visitor, Object extraData) {
-        return null;
+        return visitor.visit(this, extraData);
     }
 
     public void accept(StyleVisitor visitor) {
@@ -207,10 +182,10 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
             result = (PRIME * result) + gamma.hashCode();
         }
 
-        if (getType() != null) {
+        /*if (getType() != null) {
             result = (PRIME * result) + getType().hashCode();
         }
-
+*/
         if (getMethod() != null) {
             result = (PRIME * result) + getMethod().hashCode();
         }
@@ -228,7 +203,7 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
             ContrastEnhancementImpl other = (ContrastEnhancementImpl) obj;
 
             return Utilities.equals(gamma, other.gamma)
-                    && Utilities.equals(getType(), other.getType())
+                    //&& Utilities.equals(getType(), other.getType())
                     && Utilities.equals(getMethod(), other.getMethod());
         }
 
@@ -252,5 +227,53 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
     public void setMethod(ContrastMethod method) {
         this.method = method;
 
+    }
+    
+    /*public void setMethod(Expression exp) {
+        if(exp!=null) {
+            String meth = (String)exp.evaluate(null);
+            lookupMethod(meth);
+        }
+    }*/
+    @Override
+    public Map<String, Expression> getOptions() {
+        if(this.options == null) {
+            this.options = new HashMap<String, Expression>();
+        }
+        return this.options;
+    }
+
+    @Override
+    public boolean hasOption(String key) {
+        if(this.options == null) {
+            this.options = new HashMap<String, Expression>();
+        }
+        return options.containsKey(key);
+    }
+    
+    @Override
+    public Expression getOption(String key) {
+        return this.options.get(key);
+    }
+    @Override
+    public void addOption(String key, Expression value) {
+        if(this.options == null) {
+            this.options = new HashMap<String, Expression>();
+        } 
+        options.put(key, value);
+    }
+
+    @Override
+    public void setOptions(Map<String, Expression> options) {
+        this.options = options;
+        
+    }
+
+    @Override
+    public void setRealMethod(ContrastEnhancementMethod method) {
+        this.method = method.getMethod();
+        this.options = method.getOptions();
+        
+        
     }
 }

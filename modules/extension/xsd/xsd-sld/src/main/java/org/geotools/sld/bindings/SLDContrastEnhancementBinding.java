@@ -20,6 +20,7 @@ import org.opengis.filter.FilterFactory;
 import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
 import org.geotools.styling.ContrastEnhancement;
+import org.geotools.styling.ContrastEnhancementMethod;
 import org.geotools.styling.Histogram;
 import org.geotools.styling.Normalize;
 import org.geotools.styling.StyleFactory;
@@ -126,11 +127,11 @@ System.out.println("parsing ContrastEnhancement");
         if (node.getChild("Normalize") != null) {
             SLDNormalizeBinding binding = new SLDNormalizeBinding(styleFactory,filterFactory);
             Node child = node.getChild("Normalize");
-            ce.setMethod((Normalize)binding.parse(instance, child, value));
+            ce.setMethod((((ContrastEnhancementMethod) binding.parse(instance, child, value)).getMethod()));
         } else if (node.getChild("Histogram") != null) {
             SLDHistogramBinding binding = new SLDHistogramBinding();
             Node child = node.getChild("Histogram");
-            ce.setMethod((Histogram)binding.parse(instance, child, value));
+            ce.setMethod((((ContrastEnhancementMethod) binding.parse(instance, child, value)).getMethod()));
         }
 
         return ce;
