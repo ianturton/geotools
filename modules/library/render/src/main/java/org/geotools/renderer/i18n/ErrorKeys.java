@@ -122,4 +122,19 @@ public final class ErrorKeys {
      * Operation {0} is not supported.
      */
     public static final int UNSUPPORTED_OPERATION_$1 = 15;
+
+    /**
+     * ContrastMethod {0} is not supported.
+     */
+    public static final int UNSUPPORTED_METHOD_$1 = 17;
+
+    /**
+     * ContrastMethod Algorithm {0} is not supported.
+     */
+    public static final int UNSUPPORTED_ALGORITHM_$1 = 18;
+
+    /**
+     * Missing Parameters: Require {0},{1}
+     */
+    public static final int ILLEGAL_ARGUMENT_PARAMETERS_$2 = 19;
 }
