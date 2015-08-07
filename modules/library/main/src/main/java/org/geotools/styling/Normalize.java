@@ -29,7 +29,7 @@ import org.opengis.style.ContrastMethod;
 public class Normalize extends AbstractContrastEnhancementMethod{
 
     final static List<String> ALGORITHM_NAMES = Arrays.asList("StretchToMinimumMaximum",
-            "ClipToMinimumMaximum", "ClipToZeroMaximum");
+            "ClipToMinimumMaximum", "ClipToZero");
 
     public Normalize() {
         NAME = "Normalize";

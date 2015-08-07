@@ -449,7 +449,7 @@ public enum ContrastEnhancementType {
         }
     },
 
-    NORMALIZE_CLIP_TO_ZEROMAX {
+    NORMALIZE_CLIP_TO_ZERO {
         @Override
         RenderedImage process(ImageWorker inputWorker, Hints hints,
                 Map<String, Expression> parameters) {
@@ -487,7 +487,7 @@ public enum ContrastEnhancementType {
                 double min = (double) params.get(KEY_MIN);
                 double max = (double) params.get(KEY_MAX);
                 // create the lookup table
-                final byte[] lut = createClampingLookupTableByte(min, max, (byte)MIN_BYTE, (byte)MAX_BYTE);
+                final byte[] lut = createClampingLookupTableByte(min, max, (byte)MIN_BYTE, (byte)MIN_BYTE);
                 return generateLookupTableByte(lut);
         }
 
@@ -500,7 +500,7 @@ public enum ContrastEnhancementType {
             int dataType = (int) params.get(KEY_DATATYPE);
             double maxValue = getMaxValue(dataType);
             
-            return generateClampingPiecewise(minimum, maximum, 0, maxValue);
+            return generateClampingPiecewise(minimum, maximum, 0, 0);
             
         }
 
@@ -695,7 +695,7 @@ public enum ContrastEnhancementType {
 
     public static final String NORMALIZE_STRETCH_TO_MINMAX_NAME = "StretchToMinimumMaximum";
     public static final String NORMALIZE_CLIP_TO_MINMAX_NAME = "ClipToMinimumMaximum";
-    public static final String NORMALIZE_CLIP_TO_ZEROMAX_NAME = "ClipToZeroMaximum";
+    public static final String NORMALIZE_CLIP_TO_ZERO_NAME = "ClipToZero";
 
     private static final double DELTA = 1E-8;
 
@@ -802,8 +802,8 @@ public enum ContrastEnhancementType {
                 return NORMALIZE_STRETCH_TO_MINMAX;
             } else if (NORMALIZE_CLIP_TO_MINMAX_NAME.equals(algorithmType)) {
                 return NORMALIZE_CLIP_TO_MINMAX;
-            } else if (NORMALIZE_CLIP_TO_ZEROMAX_NAME.equals(algorithmType)) {
-                return NORMALIZE_CLIP_TO_ZEROMAX;
+            } else if (NORMALIZE_CLIP_TO_ZERO_NAME.equals(algorithmType)) {
+                return NORMALIZE_CLIP_TO_ZERO;
             }
             throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_ALGORITHM_$1,
                     algorithmType));

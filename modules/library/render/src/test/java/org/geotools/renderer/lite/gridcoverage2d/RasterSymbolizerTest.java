@@ -546,7 +546,7 @@ public class RasterSymbolizerTest  extends org.junit.Assert{
 
                 minClampValue = 50;
                 maxClampValue = 100;
-                method_6.addOption("algorithmhm", sldBuilder.literalExpression(ContrastEnhancementType.NORMALIZE_CLIP_TO_ZEROMAX_NAME));
+                method_6.addOption("algorithmhm", sldBuilder.literalExpression(ContrastEnhancementType.NORMALIZE_CLIP_TO_ZERO_NAME));
                 method_6.addOption("minValue", sldBuilder.literalExpression(minClampValue));
                 method_6.addOption("maxValue", sldBuilder.literalExpression(maxClampValue));
                 cntEnh_6.setRealMethod(method_6);
@@ -597,7 +597,7 @@ public class RasterSymbolizerTest  extends org.junit.Assert{
 
                 minClampValue = 50;
                 maxClampValue = 100;
-                method_7.addOption("algorithm",sldBuilder.literalExpression(ContrastEnhancementType.NORMALIZE_CLIP_TO_ZEROMAX_NAME));
+                method_7.addOption("algorithm",sldBuilder.literalExpression(ContrastEnhancementType.NORMALIZE_CLIP_TO_ZERO_NAME));
                 method_7.addOption("minValue", sldBuilder.literalExpression(minClampValue));
                 method_7.addOption("maxValue", sldBuilder.literalExpression(maxClampValue));
                 cntEnh_7.setRealMethod(method_7);

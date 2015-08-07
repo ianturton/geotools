@@ -19,7 +19,7 @@ http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd" version="1.0.0">
                             <SourceChannelName>1</SourceChannelName>
                                 <ContrastEnhancement>
                                     <Normalize>
-                                     <VendorOption name="algorithm">ClipToZeroMaximum</VendorOption>
+                                     <VendorOption name="algorithm">ClipToZero</VendorOption>
                                         <VendorOption name='minValue'>10</VendorOption>
                                         <VendorOption name='maxValue'>200</VendorOption>
                                     </Normalize>
