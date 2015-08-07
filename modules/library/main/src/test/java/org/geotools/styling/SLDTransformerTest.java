@@ -1525,7 +1525,7 @@ public class SLDTransformerTest {
         
         ContrastEnhancement ce = new ContrastEnhancementImpl();
         Normalize normal = new Normalize();
-        normal.setAlgorithm(ff.literal("MyTestAlgorithm"));
+        normal.setAlgorithm(ff.literal("ClipToMinimumMaximum"));
         normal.addParameter("p1", ff.literal(false));
         normal.addParameter("p2", ff.literal(23.5d));
         ce.setRealMethod(normal);
@@ -1535,7 +1535,7 @@ public class SLDTransformerTest {
         Document doc = buildTestDocument(xml);
         assertXpathExists( "//sld:ContrastEnhancement/sld:Normalize", doc);
         assertXpathEvaluatesTo("false", "//sld:ContrastEnhancement/sld:Normalize/sld:VendorOption[@name='p1']", doc);
-        assertXpathEvaluatesTo("MyTestAlgorithm", "//sld:ContrastEnhancement/sld:Normalize/sld:VendorOption[@name='Algorithm']", doc);
+        assertXpathEvaluatesTo("ClipToMinimumMaximum", "//sld:ContrastEnhancement/sld:Normalize/sld:VendorOption[@name='algorithm']", doc);
         
         Histogram hist = new Histogram();
         ce.setRealMethod(hist);
