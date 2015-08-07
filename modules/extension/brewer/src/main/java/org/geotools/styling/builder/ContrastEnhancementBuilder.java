@@ -135,8 +135,11 @@ public class ContrastEnhancementBuilder extends AbstractStyleBuilder<ContrastEnh
 
     }
 
-    
-
-    
+    /**
+     * @return
+     */
+    public ContrastEnhancementBuilder normalize() {
+        return normalize(null,null);
+    }
 
 }

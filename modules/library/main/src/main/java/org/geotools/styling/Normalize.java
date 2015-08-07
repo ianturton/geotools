@@ -43,7 +43,7 @@ public class Normalize extends AbstractContrastEnhancementMethod{
             if (algorithm != null && !ALGORITHM_NAMES.contains(algorithm)) {
                 throw new IllegalArgumentException("Unsupported Algorithm has been specified: " + algorithm);
             }
-            super.setAlgorithm(name);
         }
+        super.setAlgorithm(name);
     }
 }

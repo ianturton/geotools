@@ -52,7 +52,7 @@ import org.opengis.style.ContrastMethod;
  * 
  * This class contains implementations from previously defined algorithm, as well as new ones.
  * 
- * Define a new Type for a newly defined Method-Algorithm and implements the {@link ContrastEnhancementType#process(ImageWorker, Hints, AbstractContrastEnhancementMethod)} method.
+ * Define a new Type for a newly defined Method-Algorithm and implements the {@link ContrastEnhancementType#process(ImageWorker, Hints, Map))} method.
  * 
  * 
  * 

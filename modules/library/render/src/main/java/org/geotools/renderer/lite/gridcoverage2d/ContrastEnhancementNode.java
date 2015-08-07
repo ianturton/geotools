@@ -71,12 +71,12 @@ import org.opengis.util.InternationalString;
  * {@link ContrastEnhancement} element of the SLD 1.0 spec.
  * 
  * @author Simone Giannecchini, GeoSolutions
+ * @authod Daniele Romagnoli, GeoSolutions
  * 
  */
 class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 		implements StyleVisitor, CoverageProcessingNode {
 
-    private final static String ALGORITHM = "algorithm";
 
 	/*
 	 * (non-Javadoc)
@@ -178,7 +178,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 	        String name = method.name().toUpperCase();
 	        AbstractContrastEnhancementMethod ceMethod = null; 
 	        if ("NORMALIZE".equals(name)) {
-	            Expression algorithm = options.get(ALGORITHM);
+	            Expression algorithm = options.get(AbstractContrastEnhancementMethod.ALGORITHM);
 	            ceMethod = new Normalize();
 	            if (algorithm != null) {
 	                ceMethod.setAlgorithm(algorithm);
