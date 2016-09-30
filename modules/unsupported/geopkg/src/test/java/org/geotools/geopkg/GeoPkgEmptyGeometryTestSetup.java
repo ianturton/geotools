@@ -40,7 +40,7 @@ public class GeoPkgEmptyGeometryTestSetup extends JDBCEmptyGeometryTestSetup {
                 + "\"id\" integer, " //
                 + "\"geom_"+type.toLowerCase()+"\" geometry, " 
                 + "\"name\" varchar)");
-        
+                
         String sql = "INSERT INTO gpkg_contents (table_name, data_type, identifier, srs_id) VALUES "
                 + "('empty_"+type.toLowerCase()+"', 'features', 'empty_"+type.toLowerCase()+"', 4326)";
         run(sql);
@@ -50,7 +50,7 @@ public class GeoPkgEmptyGeometryTestSetup extends JDBCEmptyGeometryTestSetup {
         
         }
         
-		 
+	//TODO: see if we can add constraints?	 
 	            /*    + "CONSTRAINT enforce_geotype_geom_1 CHECK (geometrytype(geom_point) = 'POINT'::text OR geom_point IS NULL)," //
                     + "CONSTRAINT enforce_geotype_geom_2 CHECK (geometrytype(geom_linestring) = 'LINESTRING'::text OR geom_linestring IS NULL)," //
                     + "CONSTRAINT enforce_geotype_geom_3 CHECK (geometrytype(geom_polygon) = 'POLYGON'::text OR geom_polygon IS NULL)," //
