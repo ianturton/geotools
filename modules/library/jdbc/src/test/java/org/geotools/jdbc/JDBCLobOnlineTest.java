@@ -64,7 +64,9 @@ public abstract class JDBCLobOnlineTest extends JDBCTestSupport {
         assertTrue(fi.hasNext());
         SimpleFeature f = fi.next();
         fi.close();
-        assertTrue(Arrays.equals(new byte[] {1,2,3,4,5}, (byte[]) f.getAttribute(aname(BLOB_FIELD))));
+        assertNotNull(f);
+        byte[] observed = (byte[]) f.getAttribute(aname(BLOB_FIELD));
+        assertTrue(Arrays.equals(new byte[] {1,2,3,4,5}, observed));
         assertTrue(Arrays.equals(new byte[] {6,7,8,9,10}, (byte[]) f.getAttribute(aname(RAW_FIELD))));
         assertEquals("small clob", f.getAttribute(aname(CLOB_FIELD)));
     }
