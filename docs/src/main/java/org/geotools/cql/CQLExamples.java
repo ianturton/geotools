@@ -23,16 +23,16 @@ public class CQLExamples {
 
     private static final Logger LOGGER = Logger.getLogger(CQLExamples.class.getName());
 
-    private final int USING_EXIT = 0;
-    private final int USING_COMPARISON_PREDICATE = 1;
-    private final int USING_FUNCTIONS_IN_COMPARISON_PREDICATE = 2;
-    private final int USING_LIKE_PREDICATE = 3;
-    private final int USING_BETWEEN_PREDICATE = 4;
-    private final int USING_RELATE_PATTERN = 5;
-    private final int USING_AFTER_PREDICATE = 6;
-    private final int USING_AFTER_PREDICATE_GMT3 = 7;
-    private final int USING_BEFORE_PREDICATE = 8;
-    private final int USING_DURING_PREDICATE = 9;
+    private final static int USING_EXIT = 0;
+    private final static int USING_COMPARISON_PREDICATE = 1;
+    private final static int USING_FUNCTIONS_IN_COMPARISON_PREDICATE = 2;
+    private final static int USING_LIKE_PREDICATE = 3;
+    private final static int USING_BETWEEN_PREDICATE = 4;
+    private final static int USING_RELATE_PATTERN = 5;
+    private final static int USING_AFTER_PREDICATE = 6;
+    private final static int USING_AFTER_PREDICATE_GMT3 = 7;
+    private final static int USING_BEFORE_PREDICATE = 8;
+    private final static int USING_DURING_PREDICATE = 9;
 
 
     public static void main(String[] args) {
@@ -108,7 +108,7 @@ public class CQLExamples {
         // cql_beforePredicate start
         Before filter = (Before) CQL.toFilter("lastEarthQuake BEFORE 2006-11-30T01:30:00Z");
         // cql_beforePredicate end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         final SimpleFeature city = DataExamples.getInstanceOfCity();
         Expression leftExpr = filter.getExpression1();
@@ -125,7 +125,7 @@ public class CQLExamples {
         // cql_afterPredicate start
         After filter = (After) CQL.toFilter("lastEarthQuake AFTER 2006-11-30T01:30:00Z");
         // cql_afterPredicate end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         final SimpleFeature city = DataExamples.getInstanceOfCity();
         Expression leftExpr = filter.getExpression1();
@@ -142,7 +142,7 @@ public class CQLExamples {
         // cql_afterPredicateGMT3 start
         After filter = (After) CQL.toFilter("lastEarthQuake AFTER 2006-11-30T01:30:00+03:00");
         // cql_afterPredicateGMT3 end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         final SimpleFeature city = DataExamples.getInstanceOfCity();
         Expression leftExpr = filter.getExpression1();
@@ -159,7 +159,7 @@ public class CQLExamples {
         // cql_duringPredicate start
         During filter = (During) CQL.toFilter("lastEarthQuake DURING 1700-01-01T00:00:00/2011-01-01T00:00:00");
         // cql_duringPredicate end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         final SimpleFeature city = DataExamples.getInstanceOfCity();
         Expression leftExpr = filter.getExpression1();
@@ -181,7 +181,7 @@ public class CQLExamples {
         // cql relatePattern start
         Filter filter = CQL.toFilter("RELATE(geometry, LINESTRING (-134.921387 58.687767, -135.303391 59.092838), T*****FF*)");
         // cql relatePattern end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature usa = DataExamples.getInstanceOfCountry();
 
@@ -209,7 +209,7 @@ public class CQLExamples {
         // cql betweenPredicate start
         Filter filter = CQL.toFilter("population BETWEEN 10000000 and 20000000");
         // cql betweenPredicate end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature city = DataExamples.getInstanceOfCity();
 
@@ -230,7 +230,7 @@ public class CQLExamples {
         Filter filter = CQL.toFilter("cityName LIKE 'New%'");
         // cql likePredicate end
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature newYork = DataExamples.getInstanceOfCity();
         System.out.println("City Name: " + newYork.getProperty("cityName").getValue());

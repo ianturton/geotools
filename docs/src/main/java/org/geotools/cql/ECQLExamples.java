@@ -27,24 +27,24 @@ public class ECQLExamples {
 
     private final static Logger LOGGER = Logger.getLogger(ECQLExamples.class.getName());
 
-    private final int USING_EXIT = 0;
-    private final int USING_COMPARISON_PREDICATE_CQL_COMPATIBILITY = 1;
-    private final int USING_EXPRESSION_LESS_THAN_OR_EQUAL_TO_PROPERTY = 2;
-    private final int USING_FUNCTIONS_IN_COMPARISON_PREDICATE = 3;
-    private final int USING_LIKE_PREDICATE_IN_STRING = 4;
-    private final int USING_LIKE_PREDICATE = 5;
-    private final int USING_ILIKE_PREDICATE = 6;
-    private final int USING_COMPARISON_USING_EXPRESSIONS = 7;
-    private final int USING_BETWEEN_PREDICATE = 8;
-    private final int USING_BETWEEN_EXPRESSION = 9;
-    private final int USING_SPATIAL_OPERATION_USING_THE_CONTAINS_DE9IM = 10;
-    private final int USING_RELATE_PATTERN = 11;
-    private final int USING_AFTER_PREDICATE_WITH_LEFT_HAND_EXPRESSION = 12;
-    private final int USING_BEFORE_PREDICATE_WITH_LEFT_HAND_EXPRESSION = 13;
-    private final int USING_DURING_PREDICATE_WITH_LEFT_HAND_EXPRESSION = 14;
-    private final int USING_DURING_PREDICATE_WITH_LEFT_HAND_ATTRIBUTE = 15;
-    private final int USING_IN_PREDICATE = 16;
-    private final int USING_UTC_TIME_ZONE = 17;
+    private final static int USING_EXIT = 0;
+    private final static int USING_COMPARISON_PREDICATE_CQL_COMPATIBILITY = 1;
+    private final static int USING_EXPRESSION_LESS_THAN_OR_EQUAL_TO_PROPERTY = 2;
+    private final static int USING_FUNCTIONS_IN_COMPARISON_PREDICATE = 3;
+    private final static int USING_LIKE_PREDICATE_IN_STRING = 4;
+    private final static int USING_LIKE_PREDICATE = 5;
+    private final static int USING_ILIKE_PREDICATE = 6;
+    private final static int USING_COMPARISON_USING_EXPRESSIONS = 7;
+    private final static int USING_BETWEEN_PREDICATE = 8;
+    private final static int USING_BETWEEN_EXPRESSION = 9;
+    private final static int USING_SPATIAL_OPERATION_USING_THE_CONTAINS_DE9IM = 10;
+    private final static int USING_RELATE_PATTERN = 11;
+    private final static int USING_AFTER_PREDICATE_WITH_LEFT_HAND_EXPRESSION = 12;
+    private final static int USING_BEFORE_PREDICATE_WITH_LEFT_HAND_EXPRESSION = 13;
+    private final static int USING_DURING_PREDICATE_WITH_LEFT_HAND_EXPRESSION = 14;
+    private final static int USING_DURING_PREDICATE_WITH_LEFT_HAND_ATTRIBUTE = 15;
+    private final static int USING_IN_PREDICATE = 16;
+    private final static int USING_UTC_TIME_ZONE = 17;
 
     public static void main(String[] args) {
 
@@ -57,6 +57,9 @@ public class ECQLExamples {
 
                 int option = Integer.parseInt(line);
                 switch (option) {
+                    case '?':
+                        printCommandDocu();
+                        break;
                     case USING_EXIT:
                         System.out.println("bye!");
                         return;
@@ -115,10 +118,10 @@ public class ECQLExamples {
                         System.out.println("invalid option: " + option);
                 }
                 System.out.println("Press a key to continue.");
-
+                reader.read();
             }
         } catch (Exception e) {
-            LOGGER.severe(e.getMessage(), e);
+            LOGGER.severe(e.getMessage());
         }
     }
 
@@ -141,8 +144,8 @@ public class ECQLExamples {
         System.out.println("15 - Temporal During: lastEarthQuake DURING 1700-01-01T00:00:00Z/2011-01-01T00:00:00Z");
         System.out.println("16 - In predicate: principalMineralResource IN ('silver','oil', 'gold' )");
         System.out.println("17 - Temporal During using UTC Zone +3: 2006-11-30T01:00:00+03:00 DURING 2006-11-30T00:30:00+03:00/2006-11-30T01:30:00+03:00");
-
-        System.out.println("0 - quite");
+        System.out.println("\n? - to repeat this list");
+        System.out.println("0 - quit");
         System.out.print(">");
     }
 
@@ -156,7 +159,7 @@ public class ECQLExamples {
         // ecql relatePattern start
         Filter filter = ECQL.toFilter("RELATE(geometry, LINESTRING (-134.921387 58.687767, -135.303391 59.092838), T*****FF*)");
         // ecql relatePattern end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature usa = DataExamples.getInstanceOfCountry();
 
@@ -171,7 +174,7 @@ public class ECQLExamples {
         // afterPredicateWithLefHandtExpression start
         Filter filter = ECQL.toFilter("2006-11-30T01:00:00Z AFTER 2006-11-30T01:30:00Z");
         // afterPredicateWithLefHandtExpression end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(null);
         System.out.println("Result of filter evaluation: " + result);
@@ -183,7 +186,7 @@ public class ECQLExamples {
         // beforePredicateWithLefHandtExpression start
         Filter filter = ECQL.toFilter("2006-11-30T01:00:00Z BEFORE 2006-11-30T01:30:00Z");
         // beforePredicateWithLefHandtExpression end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(null);
         System.out.println("Result of filter evaluation: " + result);
@@ -195,7 +198,7 @@ public class ECQLExamples {
         // duringPredicateWithLefHandtExpression start
         Filter filter = ECQL.toFilter("2006-11-30T01:00:00Z DURING 2006-11-30T00:30:00Z/2006-11-30T01:30:00Z ");
         // duringPredicateWithLefHandtExpression end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(null);
         System.out.println("Result of filter evaluation: " + result);
@@ -206,7 +209,7 @@ public class ECQLExamples {
         // utcTimeZone start
         Filter filter = ECQL.toFilter("2006-11-30T01:00:00+03:00 DURING 2006-11-30T00:30:00+03:00/2006-11-30T01:30:00+03:00 ");
         // utcTimeZone end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(null);
         System.out.println("Result of filter evaluation: " + result);
@@ -226,7 +229,7 @@ public class ECQLExamples {
         // duringPredicateWithLefHandtAttribute start
         During filter = (During) ECQL.toFilter("lastEarthQuake DURING 1700-01-01T00:00:00Z/2011-01-01T00:00:00Z");
         // duringPredicateWithLefHandtAttribute end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         final SimpleFeature city = DataExamples.getInstanceOfCity();
         Expression leftExpr = filter.getExpression1();
@@ -257,7 +260,7 @@ public class ECQLExamples {
             throw new Exception("uncompatible ECQL Syntax");
         } else {
             System.out.println("CQL and ECQL have produced the same filter for the predicate \"POPULTATION >= 1000\"");
-            Utility.prittyPrintFilter(filter);
+            Utility.prettyPrintFilter(filter);
         }
     }
 
@@ -274,7 +277,7 @@ public class ECQLExamples {
         Filter filter = ECQL.toFilter("1000 <= population");
         // ecql expressionLessThanOrEqualToProperty end
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature usa = DataExamples.getInstanceOfCountry();
         System.out.println("Country: " + usa.getProperty("countryName").getValue());
@@ -296,7 +299,7 @@ public class ECQLExamples {
         // comparisonUsingExpressions end
         SimpleFeature city = DataExamples.getInstanceOfCity();
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         PropertyIsLessThan lessThan = (PropertyIsLessThan) filter;
         Expression leftExpr = lessThan.getExpression1();
@@ -313,7 +316,7 @@ public class ECQLExamples {
         // ecql betweenPredicate start
         Filter filter = ECQL.toFilter("population BETWEEN 10000000 and 20000000");
         // ecql betweenPredicate end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature city = DataExamples.getInstanceOfCity();
 
@@ -328,7 +331,7 @@ public class ECQLExamples {
         // betweenUsingExpression start
         Filter filter = ECQL.toFilter("area( Polygon((10 10, 20 10, 20 20, 10 10)) ) BETWEEN 10000 AND 30000");
         // betweenUsingExpression end
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(null);
         System.out.println("Result of filter evaluation: " + result);
@@ -345,7 +348,7 @@ public class ECQLExamples {
         Filter filter = ECQL.toFilter("cityName LIKE 'New%'");
         // ecql likePredicate end
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature newYork = DataExamples.getInstanceOfCity();
         System.out.println("City Name: " + newYork.getProperty("cityName").getValue());
@@ -365,7 +368,7 @@ public class ECQLExamples {
         Filter filter = ECQL.toFilter("cityName ILIKE 'new%'");
         // ecql ilikePredicate end
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         SimpleFeature newYork = DataExamples.getInstanceOfCity();
         System.out.println("City Name: " + newYork.getProperty("cityName").getValue());
@@ -384,7 +387,7 @@ public class ECQLExamples {
         Filter filter = ECQL.toFilter("'aabbcc' LIKE '%bb%'");
         // ecql likePredicateInString end
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(null);
         System.out.println("Result of filter evaluation: " + result);
@@ -399,7 +402,7 @@ public class ECQLExamples {
         System.out.println("coutry: " + country.getAttribute("countryName"));
         System.out.println("population: " + country.getAttribute("principalMineralResource"));
 
-        Utility.prittyPrintFilter(filter);
+        Utility.prettyPrintFilter(filter);
 
         Boolean result = filter.evaluate(country);
 

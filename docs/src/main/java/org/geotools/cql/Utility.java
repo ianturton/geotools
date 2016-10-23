@@ -15,7 +15,7 @@ final class Utility {
 	private Utility(){
 		// utility class
 	}
-	public  static void prittyPrintFilter(Filter filter) {
+	public  static void prettyPrintFilter(Filter filter) {
         System.out.println("The filter result is:\n" + filter.toString());         
     }
 
