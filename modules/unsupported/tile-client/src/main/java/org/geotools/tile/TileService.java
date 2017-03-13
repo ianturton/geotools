@@ -234,8 +234,9 @@ public abstract class TileService {
             int scaleFactor, boolean recommendedZoomLevel, int maxNumberOfTiles) {
 
         ReferencedEnvelope mapExtent = createSafeEnvelopeInWGS84(_mapExtent);
+        System.out.println(mapExtent);
         ReferencedEnvelope extent = normalizeExtent(mapExtent);
-
+        System.out.println(extent);
         // only continue, if we have tiles that cover the requested extent
         if (!extent.intersects((Envelope) getBounds())) {
             return Collections.emptySet();
