@@ -32,72 +32,77 @@ public class WMTSTileFactoryTest extends TileFactoryTest {
 
     @Test
     public void testGetTileFromCoordinate() {
+        for (WMTSServiceType t : WMTSServiceType.values()) {
+            TileService service = createService(t);
+            Tile tile = factory.findTileAtCoordinate(51, 7, new WebMercatorZoomLevel(5),
+                    service);
 
-        Tile tile = factory.findTileAtCoordinate(51, 7,
-                new WebMercatorZoomLevel(5), createService());
-
-        TileService service = createService();
-        WMTSTile expectedTile = new WMTSTile(20, 15, new WebMercatorZoomLevel(5),
-                service);
-        Assert.assertEquals(expectedTile, tile);
+            
+            WMTSTile expectedTile = new WMTSTile(20, 15, new WebMercatorZoomLevel(5), service);
+            Assert.assertEquals(expectedTile, tile);
+        }
 
     }
 
     @Test
     public void testFindRightNeighbour() {
+        for (WMTSServiceType t : WMTSServiceType.values()) {
+            TileService service = createService(t);
+            WMTSTile tile = new WMTSTile(20, 15, new WebMercatorZoomLevel(5), service);
 
-        TileService service = createService();
-        WMTSTile tile = new WMTSTile(20, 15, new WebMercatorZoomLevel(5), service);
+            Tile neighbour = factory.findRightNeighbour(tile, service);
 
-        Tile neighbour = factory.findRightNeighbour(tile, service);
+            WMTSTile expectedNeighbour = new WMTSTile(21, 15, new WebMercatorZoomLevel(5), service);
 
-        WMTSTile expectedNeighbour = new WMTSTile(21, 15,
-                new WebMercatorZoomLevel(5), service);
-
-        Assert.assertEquals(expectedNeighbour, neighbour);
-
+            Assert.assertEquals(expectedNeighbour, neighbour);
+        }
     }
 
     @Test
     public void testFindLowerNeighbour() {
+        for (WMTSServiceType t : WMTSServiceType.values()) {
+            TileService service = createService(t);
+            WMTSTile tile = new WMTSTile(20, 15, new WebMercatorZoomLevel(5), service);
 
-        TileService service = createService();
-        WMTSTile tile = new WMTSTile(20, 15, new WebMercatorZoomLevel(5), service);
+            Tile neighbour = factory.findLowerNeighbour(tile, service);
 
-        Tile neighbour = factory.findLowerNeighbour(tile, service);
+            WMTSTile expectedNeighbour = new WMTSTile(20, 16, new WebMercatorZoomLevel(5), service);
 
-        WMTSTile expectedNeighbour = new WMTSTile(20, 16,
-                new WebMercatorZoomLevel(5), service);
-
-        Assert.assertEquals(expectedNeighbour, neighbour);
+            Assert.assertEquals(expectedNeighbour, neighbour);
+        }
 
     }
 
     @Test
     public void testGetExtentFromTileName() {
 
-        WMTSTileIdentifier tileId = new WMTSTileIdentifier(10, 12,
-                new WebMercatorZoomLevel(5), "SomeName");
-        WMTSTile tile = new WMTSTile(tileId, createService());
+        for (WMTSServiceType t : WMTSServiceType.values()) {
+            WMTSTileIdentifier tileId = new WMTSTileIdentifier(10, 12, new WebMercatorZoomLevel(5),
+                    "SomeName");
+            WMTSTile tile = new WMTSTile(tileId, createService(t));
 
-        ReferencedEnvelope env = WebMercatorTileFactory
-                .getExtentFromTileName(tileId);
+            ReferencedEnvelope env = WebMercatorTileFactory.getExtentFromTileName(tileId);
 
-        Assert.assertEquals(tile.getExtent(), env);
+            Assert.assertEquals(tile.getExtent(), env);
 
-        ReferencedEnvelope expectedEnv = new ReferencedEnvelope(-67.5, -56.25,
-                31.9521622380, 40.9798980, DefaultGeographicCRS.WGS84);
+            ReferencedEnvelope expectedEnv = new ReferencedEnvelope(-67.5, -56.25, 31.9521622380,
+                    40.9798980, DefaultGeographicCRS.WGS84);
 
-        Assert.assertEquals(env.getMinX(), expectedEnv.getMinX(), 0.000001);
-        Assert.assertEquals(env.getMinY(), expectedEnv.getMinY(), 0.000001);
-        Assert.assertEquals(env.getMaxX(), expectedEnv.getMaxX(), 0.000001);
-        Assert.assertEquals(env.getMaxY(), expectedEnv.getMaxY(), 0.000001);
-
+            Assert.assertEquals(env.getMinX(), expectedEnv.getMinX(), 0.000001);
+            Assert.assertEquals(env.getMinY(), expectedEnv.getMinY(), 0.000001);
+            Assert.assertEquals(env.getMaxX(), expectedEnv.getMaxX(), 0.000001);
+            Assert.assertEquals(env.getMaxY(), expectedEnv.getMaxY(), 0.000001);
+        }
     }
 
-    private TileService createService() {
-        String baseURL = "http://raspberrypi:9000/wmts/1.0.0/WMTSCapabilities.xml";
-        return new WMTSService("states", baseURL,"states","webmercator");
+    private TileService createService(WMTSServiceType type) {
+        if(WMTSServiceType.REST.equals(type)) {
+            String baseURL = "http://raspberrypi:9000/wmts/1.0.0/WMTSCapabilities.xml";
+            return new WMTSService("states", baseURL, "states", "webmercator", type);
+        }else {
+            String baseURL = "http://raspberrypi:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities";
+            return new WMTSService("states", baseURL, "states", "webmercator", type);
+        }
 
     }
 

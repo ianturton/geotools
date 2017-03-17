@@ -48,7 +48,7 @@ import org.geotools.util.logging.Logging;
  */
 public abstract class Tile implements ImageLoader {
 
-    private static final Logger LOGGER = Logging.getLogger(Tile.class
+    protected static final Logger LOGGER = Logging.getLogger(Tile.class
             .getPackage().getName());
 
     /**

@@ -27,7 +27,7 @@ import org.geotools.tile.impl.osm.OSMTileIdentifier;
 public class WMTSTileIdentifier extends TileIdentifier {
 
     /**
-     * create an identifier based on /states/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png
+     * create an identifier based on /layername/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png
      * 
      * @param x
      * @param y

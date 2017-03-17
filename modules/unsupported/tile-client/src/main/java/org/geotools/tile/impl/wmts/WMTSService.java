@@ -19,6 +19,7 @@ package org.geotools.tile.impl.wmts;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,6 +59,8 @@ public class WMTSService extends TileService {
 
     private static final String OWS = "http://www.opengis.net/ows/1.1";
 
+    private static final String xlink = "http://www.w3.org/1999/xlink";
+
     private String tileMatrixSetName = "";
 
     private double[] scaleList;
@@ -66,20 +69,39 @@ public class WMTSService extends TileService {
 
     private String layerName;
 
+    private String styleName = ""; // Default style is ""
+
     private ReferencedEnvelope envelope;
 
     private String templateURL;
+
+    private WMTSServiceType type = WMTSServiceType.REST;
 
     /**
      * 
      * @param name - a name to refer to the layer by.
      * @param baseURL - the templated ResourceURL from the getcapabilities document.
      */
-    public WMTSService(String name, String baseURL, String layerName, String tileMatrixSetName) {
+    public WMTSService(String name, String baseURL, String layerName, String tileMatrixSetName,
+            WMTSServiceType type) {
         super(name, baseURL);
         setLayerName(layerName);
+        setType(type);
         setTileMatrixSetName(tileMatrixSetName);
+    }
 
+    /**
+     * @return the type
+     */
+    public WMTSServiceType getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(WMTSServiceType type) {
+        this.type = type;
     }
 
     /**
@@ -96,6 +118,20 @@ public class WMTSService extends TileService {
         return layerName;
     }
 
+    /**
+     * @return the styleName
+     */
+    public String getStyleName() {
+        return styleName;
+    }
+
+    /**
+     * @param styleName the styleName to set
+     */
+    public void setStyleName(String styleName) {
+        this.styleName = styleName;
+    }
+
     @Override
     public double[] getScaleList() {
         return scaleList;
@@ -108,7 +144,7 @@ public class WMTSService extends TileService {
             return envelope;
         }
         // Look this up from the CRS
-        Extent extent = this.getProjectedTileCrs().getDomainOfValidity();
+        Extent extent = getProjectedTileCrs().getDomainOfValidity();
         Iterator<? extends GeographicExtent> itr = extent.getGeographicElements().iterator();
         while (itr.hasNext()) {
             GeographicExtent ex = itr.next();
@@ -124,6 +160,8 @@ public class WMTSService extends TileService {
             }
 
         }
+        LOGGER.severe(
+                "Unable to determine Geographic Extent of CRS:" + getProjectedTileCrs().toString());
         return null;
     }
 
@@ -159,13 +197,133 @@ public class WMTSService extends TileService {
         }
 
         this.tileMatrixSetName = tileMatrixSetName;
-        extractTileMatrixSet();
+        if (WMTSServiceType.REST.equals(type)) {
+            extractRestTileMatrixSet();
+        }
+        if (WMTSServiceType.KVP.equals(type)) {
+            extractKVPTileMatrixSet();
+        }
+    }
+
+    /**
+     * 
+     */
+    private void extractKVPTileMatrixSet() {
+        HttpClient client = new HttpClient();
+        HttpMethod method = new GetMethod(getBaseUrl());
+        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+                new DefaultHttpMethodRetryHandler(3, false));
+        try {
+            // Execute the method.
+            int statusCode = client.executeMethod(method);
+
+            if (statusCode != HttpStatus.SC_OK) {
+                LOGGER.severe("Method failed: " + method.getStatusLine());
+
+            }
+
+            // Read the response body.
+            byte[] responseBody = method.getResponseBody();
+
+            // Deal with the response.
+            // Use caution: ensure correct character encoding and is not binary data
+            // System.out.println(new String(responseBody,"UTF-8"));
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+
+            org.w3c.dom.Document doc = db.parse(new ByteArrayInputStream(responseBody));
+
+            NodeList ops = doc.getElementsByTagNameNS(OWS, "Operation");
+            for (int i = 0; i < ops.getLength(); i++) {
+                Element element = (Element) ops.item(i);
+                if(element.getAttribute("name").equalsIgnoreCase("GetTile")) {
+                    NodeList values = element.getElementsByTagNameNS(OWS, "Get");
+                    Element url = (Element)values.item(0);
+                    
+                    templateURL=url.getAttributeNS(xlink,"href");
+                }
+            }
+            
+            // read layer info
+
+            NodeList layers = doc.getElementsByTagName("Layer");
+            for (int i = 0; i < layers.getLength(); i++) {
+                Element element = (Element) layers.item(i);
+                NodeList names = element.getElementsByTagNameNS(OWS, "Identifier");
+                if (layerName.equalsIgnoreCase(names.item(0).getTextContent())) {
+                    envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+
+                    Element layer = (Element) layers.item(i);
+                    getWGS84Bounds(layer);
+                    
+                }
+            }
+
+            NodeList tms = doc.getElementsByTagName("TileMatrixSet");
+            for (int i = 0; i < tms.getLength(); i++) {
+                Element e = (Element) tms.item(i);
+                NodeList names = e.getElementsByTagNameNS("http://www.opengis.net/ows/1.1",
+                        "Identifier");
+                if (names.getLength() == 0) { // annoyingly TileMatrixSet tag is used in layers too!
+                    continue;
+                }
+
+                if (tileMatrixSetName.equalsIgnoreCase(names.item(0).getTextContent())) {
+                    matrixSet = TileMatrixSet.parseTileMatrixSet(e);
+                    scaleList = new double[matrixSet.size()];
+                    int j = 0;
+                    for (TileMatrix tm : matrixSet.getMatrices()) {
+                        scaleList[j++] = tm.getDenominator();
+                    }
+                }
+            }
+            // TODO: Tidy these exceptions up and throw something
+        } catch (HttpException e) {
+            System.err.println("Fatal protocol violation: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Fatal transport error: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            // Release the connection.
+            method.releaseConnection();
+        }
+
+    }
+
+    /**
+     * @param layer
+     */
+    private void getWGS84Bounds(Element layer) {
+        Node wgsbbox = layer.getElementsByTagNameNS(OWS, "WGS84BoundingBox").item(0);
+        NodeList bbox = wgsbbox.getChildNodes();
+        for (int j = 0; j < bbox.getLength(); j++) {
+            if (!(bbox.item(j) instanceof Element))
+                continue;
+            Element e = (Element) bbox.item(j);
+
+            if (e.getLocalName().equals("LowerCorner")
+                    || e.getLocalName().equals("UpperCorner")) {
+                String coords[] = e.getTextContent().split(" ");
+
+                envelope.expandToInclude(Double.parseDouble(coords[0]),
+                        Double.parseDouble(coords[1]));
+            }
+        }
     }
 
     /**
      * Extract the scales, bbox etc from capabilities.
      */
-    private void extractTileMatrixSet() {
+    private void extractRestTileMatrixSet() {
 
         HttpClient client = new HttpClient();
         HttpMethod method = new GetMethod(getBaseUrl());
@@ -176,7 +334,8 @@ public class WMTSService extends TileService {
             int statusCode = client.executeMethod(method);
 
             if (statusCode != HttpStatus.SC_OK) {
-                System.err.println("Method failed: " + method.getStatusLine());
+                LOGGER.severe("Method failed: " + method.getStatusLine());
+
             }
 
             // Read the response body.
@@ -197,27 +356,12 @@ public class WMTSService extends TileService {
             NodeList layers = doc.getElementsByTagName("Layer");
             for (int i = 0; i < layers.getLength(); i++) {
                 Element element = (Element) layers.item(i);
-                NodeList names = element.getElementsByTagNameNS("http://www.opengis.net/ows/1.1",
-                        "Identifier");
+                NodeList names = element.getElementsByTagNameNS(OWS, "Identifier");
                 if (layerName.equalsIgnoreCase(names.item(0).getTextContent())) {
                     envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
 
                     Element layer = (Element) layers.item(i);
-                    Node wgsbbox = layer.getElementsByTagNameNS(OWS, "WGS84BoundingBox").item(0);
-                    NodeList bbox = wgsbbox.getChildNodes();
-                    for (int j = 0; j < bbox.getLength(); j++) {
-                        if (!(bbox.item(j) instanceof Element))
-                            continue;
-                        Element e = (Element) bbox.item(j);
-
-                        if (e.getLocalName().equals("LowerCorner")
-                                || e.getLocalName().equals("UpperCorner")) {
-                            String coords[] = e.getTextContent().split(" ");
-
-                            envelope.expandToInclude(Double.parseDouble(coords[0]),
-                                    Double.parseDouble(coords[1]));
-                        }
-                    }
+                    getWGS84Bounds(layer);
                     Element resource = (Element) layer.getElementsByTagName("ResourceURL").item(0);
                     templateURL = resource.getAttribute("template");
                 }

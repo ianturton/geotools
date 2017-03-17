@@ -17,6 +17,7 @@
 package org.geotools.tile.impl.wmts;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -25,8 +26,25 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
 public class TileMatrixSet {
-    final public static String OWS = "http://www.opengis.net/ows/1.1"; 
+    private static CoordinateReferenceSystem WEB_MERCATOR_CRS;
+
+    static {
+        CoordinateReferenceSystem tmpCrs = null;
+
+        try {
+            tmpCrs = CRS.decode("EPSG:3857");
+        } catch (FactoryException e) {
+            /*LOGGER.log(Level.SEVERE,
+                    "Failed to create Web Mercator CRS EPSG:3857", e);*/
+            throw new RuntimeException(e);
+        }
+        WEB_MERCATOR_CRS = tmpCrs;
+
+    }
+    final public static String OWS = "http://www.opengis.net/ows/1.1";
+
     private String identifier;
 
     private String crs;
@@ -57,6 +75,12 @@ public class TileMatrixSet {
 
     public CoordinateReferenceSystem getCoordinateReferenceSystem()
             throws NoSuchAuthorityCodeException, FactoryException {
+        
+        //TODO: Kill who ever is still using this hack!
+        if(crs.equalsIgnoreCase("epsg:900913")||crs.equalsIgnoreCase("urn:ogc:def:crs:EPSG::900913")) {
+            return WEB_MERCATOR_CRS;
+        }
+        
         return CRS.decode(crs);
     }
 
@@ -86,9 +110,9 @@ public class TileMatrixSet {
      */
     public static TileMatrixSet parseTileMatrixSet(Element e) {
         TileMatrixSet ret = new TileMatrixSet();
-        NodeList crs = e.getElementsByTagNameNS(OWS,"SupportedCRS");
+        NodeList crs = e.getElementsByTagNameNS(OWS, "SupportedCRS");
         ret.setCRS(crs.item(0).getTextContent());
-        NodeList id = e.getElementsByTagNameNS(OWS,"Identifier");
+        NodeList id = e.getElementsByTagNameNS(OWS, "Identifier");
         ret.setIdentifier(id.item(0).getTextContent());
         NodeList matices = e.getElementsByTagName("TileMatrix");
 

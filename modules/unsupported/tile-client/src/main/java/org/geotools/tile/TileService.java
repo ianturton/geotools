@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class TileService {
 
-    private static final Logger LOGGER = Logging.getLogger(TileService.class
+    protected static final Logger LOGGER = Logging.getLogger(TileService.class
             .getPackage().getName());
 
     /**
