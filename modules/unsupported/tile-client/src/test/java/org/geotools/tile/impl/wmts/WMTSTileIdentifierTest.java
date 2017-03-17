@@ -27,7 +27,7 @@ public class WMTSTileIdentifierTest extends TileIdentifierTest {
 
     @Test
     public void testGetId() {
-        System.out.println(this.tileId.getId());
+        
         Assert.assertEquals("SomeService_5_10_12", this.tileId.getId());
     }
 
