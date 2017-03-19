@@ -188,4 +188,12 @@ public class TileMatrix {
         sb.append(getTileWidth()).append("x").append(getTileHeight()).append("\n");
         return sb.toString();
     }
+
+    /**
+     * @param doubleValue
+     * @param doubleValue2
+     */
+    public void setTopLeft(double x, double y) {
+        topLeft = gf.createPoint(new Coordinate(x,y));
+    }
 }
