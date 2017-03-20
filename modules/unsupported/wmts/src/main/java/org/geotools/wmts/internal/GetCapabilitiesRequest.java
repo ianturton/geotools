@@ -35,9 +35,7 @@ import org.geotools.data.ows.HTTPResponse;
 import org.geotools.data.ows.SimpleHttpClient;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-
 import org.geotools.tile.impl.wmts.WMTSServiceType;
-import org.geotools.tile.impl.wmts.WMTSZoomLevel;
 import org.geotools.wmts.TileMatrixLimit;
 import org.geotools.wmts.WMTSLayer;
 import org.geotools.wmts.WMTSOperationType;
@@ -104,15 +102,19 @@ public class GetCapabilitiesRequest {
                 LayerType layer = (LayerType) l.getValue();
                 String name = layer.getIdentifier().getValue();
                 HashSet<String> styles = new HashSet<>();
-                System.out.println(name);
+                String defaultStyle = "";
                 for (Style s : layer.getStyle()) {
-
+                    
                     String styleName = s.getIdentifier().getValue();
+                    
                     styles.add(styleName);
-                    System.out.println("\t" + styleName);
+                    if(s.isIsDefault()) {
+                        defaultStyle =styleName; 
+                    }
                 }
                 Set<String> matrixes = new HashSet<>();
                 WMTSLayer wLayer = new WMTSLayer(name, styles, matrixes);
+                wLayer.setStyle(defaultStyle);
                 List<WGS84BoundingBoxType> boundingBox = layer.getWGS84BoundingBox();
                 if (boundingBox.size() > 0) {
                     BoundingBoxType bbox = boundingBox.get(0);
