@@ -14,10 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wmts;
+package org.geotools.data.wmts;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,23 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.geotools.wmts.internal.GetCapabilitiesRequest;
+import org.geotools.data.wmts.internal.GetCapabilitiesRequest;
+import org.geotools.tile.impl.wmts.TileMatrixSet;
 
 /**
  * @author ian
  *
  */
 public class GetCapabilities {
+
+    private static final String VERSION = "version";
+
+    private static final String REQUEST = "request";
+
+    private static final String SERVICE = "service";
+
+    private static final String BASEURL = "baseurl";
+
     String requestURL = "";
 
     WMTSOperationType getCapabilities;
@@ -46,7 +57,21 @@ public class GetCapabilities {
      * @param requestURL
      */
     public GetCapabilities(String baseURL, Map<String, String> params) {
+        params.put(BASEURL, baseURL);
+        setup(params);
+    }
+    /**
+     * @param map
+     */
+    public GetCapabilities(HashMap<String, String> map) {
+        setup(map);
+    }
+    /**
+     * @param requestURL
+     */
+    private void setup(Map<String, String> params) {
         TreeMap<String, String> lowerParams = new TreeMap<>();
+        String baseURL = params.get(BASEURL);
         if (!baseURL.contains("?")) {
             baseURL += "?";
         } else {
@@ -68,14 +93,14 @@ public class GetCapabilities {
                 lowerParams.put(e.getKey().toLowerCase(), e.getValue());
             }
         }
-        if (!lowerParams.containsKey("service")) {
-            lowerParams.put("service", "wmts");
+        if (!lowerParams.containsKey(SERVICE)) {
+            lowerParams.put(SERVICE, "wmts");
         }
-        if (!lowerParams.containsKey("request")) {
-            lowerParams.put("request", "GetCapabilities");
+        if (!lowerParams.containsKey(REQUEST)) {
+            lowerParams.put(REQUEST, "GetCapabilities");
         }
-        if(!lowerParams.containsKey("version")) {
-            lowerParams.put("version", "1.0.0");
+        if(!lowerParams.containsKey(VERSION)) {
+            lowerParams.put(VERSION, "1.0.0");
         }
         this.requestURL = baseURL + generateParamString(lowerParams);
 
@@ -151,10 +176,40 @@ public class GetCapabilities {
         return getFeatureInfo;
     }
 
-    public List<WMTSLayer> getLayers(){
+    public List<Layer> getLayerList(){
         if(req==null) {
             fetchCapabilities();
         }
+        ArrayList<Layer> ret = new ArrayList<>();
+        ret.addAll(req.getLayers().values());
+        return ret;
+    }
+    
+    public Map<String, Layer> getLayers(){
+        if(req==null) {
+            fetchCapabilities();
+        }
+        
         return req.getLayers();
+    }
+    
+    public Map<String, TileMatrixSet> getTileMatracies(){
+        if(req==null) {
+            fetchCapabilities();
+        }
+        return req.getTileMatrixSets();
+    }
+    
+    public Map<String, TileMatrixSet> getTileMatracies(String crs){
+        if(req==null) {
+            fetchCapabilities();
+        }
+        HashMap<String, TileMatrixSet> ret = new HashMap<>();
+        for(TileMatrixSet t:req.getTileMatrixSets().values()) {
+            if(t.getCrs().equalsIgnoreCase(crs)) {
+                ret.put(t.getIdentifier(),t);
+            }
+        }
+        return ret;
     }
 }

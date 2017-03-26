@@ -23,6 +23,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import org.geotools.data.ows.OperationType;
+import org.geotools.data.wmts.internal.GetCapabilitiesRequest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class GetCapabilitiesRequestTest {
     }
 
     /**
-     * Test method for {@link org.geotools.wmts.internal.GetCapabilitiesRequest#getCapabilities()}.
+     * Test method for {@link org.geotools.data.wmts.internal.GetCapabilitiesRequest#getCapabilities()}.
      */
     @Test
     public void testGetCapabilities() {

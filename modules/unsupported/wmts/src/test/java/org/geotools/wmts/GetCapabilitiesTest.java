@@ -18,9 +18,12 @@ package org.geotools.wmts;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.geotools.data.wmts.GetCapabilities;
+import org.geotools.data.wmts.Layer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -101,8 +104,8 @@ public class GetCapabilitiesTest {
         baseURL = "http://raspberrypi:9000/wmts/1.0.0/WMTSCapabilities.xml";
         baseURL = "http://raspberrypi:9000/service?REQUEST=GetCapabilities&SERVICE=WMTS";
         GetCapabilities caps = new GetCapabilities(baseURL, null);
-        List<WMTSLayer> layers = caps.getLayers();
-        for(WMTSLayer layer:layers) {
+        List<Layer> layers = new ArrayList<>(caps.getLayers().values());
+        for(Layer layer:layers) {
             System.out.println(layer);
         }
     }

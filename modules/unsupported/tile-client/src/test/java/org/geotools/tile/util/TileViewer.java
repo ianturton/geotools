@@ -97,11 +97,11 @@ public class TileViewer {
         /*String baseURL = "http://raspberrypi:9000/wmts/1.0.0/WMTSCapabilities.xml";
         TileService service = new WMTSService("states", baseURL, "states", "webmercator",WMTSServiceType.REST);*/
         
-        String baseURL = "http://raspberrypi:9000/service?REQUEST=GetCapabilities&SERVICE=WMTS";
-        TileService service = new WMTSService("states", baseURL, "states", "webmercator",WMTSServiceType.KVP);
+        /*String baseURL = "http://raspberrypi:9000/service?REQUEST=GetCapabilities&SERVICE=WMTS";
+        TileService service = new WMTSService("states", baseURL, "states", "webmercator",WMTSServiceType.KVP);*/
         
-        /*String baseURL = "http://raspberrypi:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities";
-        TileService service = new WMTSService("states", baseURL, "topp:states", "EPSG:900913",WMTSServiceType.KVP);*/
+        String baseURL = "http://raspberrypi:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities";
+        TileService service = new WMTSService("states", baseURL, "topp:states", "EPSG:900913",WMTSServiceType.KVP);
         map.addLayer(new AsyncTileLayer(service));
         // createTestCoverageLayer(map);
 

@@ -270,7 +270,9 @@ public class WMTSService extends TileService {
                     continue;
                 }
 
-                if (tileMatrixSetName.equalsIgnoreCase(names.item(0).getTextContent())) {
+                String setName = names.item(0).getTextContent();
+                
+                if (tileMatrixSetName.equalsIgnoreCase(setName)) {
                     matrixSet = TileMatrixSet.parseTileMatrixSet(e);
                     scaleList = new double[matrixSet.size()];
                     int j = 0;

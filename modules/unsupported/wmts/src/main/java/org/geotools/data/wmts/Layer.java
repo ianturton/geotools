@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wmts;
+package org.geotools.data.wmts;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +28,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @author ian
  *
  */
-public class WMTSLayer extends SimpleLayer {
+public class Layer extends SimpleLayer {
     Set<String> tileMatrixSetNames = new HashSet<>();
     HashMap<String,List<TileMatrixLimit>> limits = new HashMap<String, List<TileMatrixLimit>>();
     ReferencedEnvelope bounds;
@@ -42,7 +42,7 @@ public class WMTSLayer extends SimpleLayer {
      * @param name Name of layer
      * @param style Name of style, null indicates default.
      */
-    public WMTSLayer(String name, String style, Set<String> tileMatrixSetNames) {
+    public Layer(String name, String style, Set<String> tileMatrixSetNames) {
         super(name, style);
         setTileMatrixSetNames(tileMatrixSetNames);
     }
@@ -51,7 +51,7 @@ public class WMTSLayer extends SimpleLayer {
      * @param name
      * @param validStyles
      */
-    public WMTSLayer(String name, Set<String> validStyles, Set<String> tileMatrixSetNames) {
+    public Layer(String name, Set<String> validStyles, Set<String> tileMatrixSetNames) {
         super(name, validStyles);
         setTileMatrixSetNames(tileMatrixSetNames);
     }
@@ -163,6 +163,36 @@ public class WMTSLayer extends SimpleLayer {
      */
     public String getTemplate() {
         return template;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Layer)) {
+            return false;
+        }
+        Layer other = (Layer) obj;
+        if (getName() == null) {
+            if (other.getName() != null) {
+                return false;
+            }
+        } else if (!getName().equals(other.getName())) {
+            return false;
+        }
+        return true;
     }
 
 }

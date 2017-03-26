@@ -14,12 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wmts.internal;
+package org.geotools.data.wmts.internal;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,12 +34,12 @@ import javax.xml.bind.Unmarshaller;
 
 import org.geotools.data.ows.HTTPResponse;
 import org.geotools.data.ows.SimpleHttpClient;
+import org.geotools.data.wmts.TileMatrixLimit;
+import org.geotools.data.wmts.Layer;
+import org.geotools.data.wmts.WMTSOperationType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.tile.impl.wmts.WMTSServiceType;
-import org.geotools.wmts.TileMatrixLimit;
-import org.geotools.wmts.WMTSLayer;
-import org.geotools.wmts.WMTSOperationType;
 
 import net.opengis.ows.v_1_1_0.BoundingBoxType;
 import net.opengis.ows.v_1_1_0.DCP;
@@ -76,6 +77,8 @@ public class GetCapabilitiesRequest {
 
     String url = "";
 
+    private HashMap<String, org.geotools.tile.impl.wmts.TileMatrixSet> tileMatrixSets = new HashMap<>();
+
     public GetCapabilitiesRequest(String request) {
         url = request;
         SimpleHttpClient client = new SimpleHttpClient();
@@ -93,8 +96,8 @@ public class GetCapabilitiesRequest {
 
     }
 
-    public List<WMTSLayer> getLayers() {
-        ArrayList<WMTSLayer> ret = new ArrayList<>();
+    public HashMap<String, Layer> getLayers() {
+        HashMap<String, Layer> ret = new HashMap<>();
         for (JAXBElement<DatasetDescriptionSummaryBaseType> l : caps.getContents()
                 .getDatasetDescriptionSummary()) {
             if (l.getName().getLocalPart().equalsIgnoreCase("Layer")) {
@@ -104,16 +107,16 @@ public class GetCapabilitiesRequest {
                 HashSet<String> styles = new HashSet<>();
                 String defaultStyle = "";
                 for (Style s : layer.getStyle()) {
-                    
+
                     String styleName = s.getIdentifier().getValue();
-                    
+
                     styles.add(styleName);
-                    if(s.isIsDefault()) {
-                        defaultStyle =styleName; 
+                    if (s.isIsDefault()) {
+                        defaultStyle = styleName;
                     }
                 }
                 Set<String> matrixes = new HashSet<>();
-                WMTSLayer wLayer = new WMTSLayer(name, styles, matrixes);
+                Layer wLayer = new Layer(name, styles, matrixes);
                 wLayer.setStyle(defaultStyle);
                 List<WGS84BoundingBoxType> boundingBox = layer.getWGS84BoundingBox();
                 if (boundingBox.size() > 0) {
@@ -145,9 +148,9 @@ public class GetCapabilitiesRequest {
                         wLayer.setLimits(tmsl.getTileMatrixSet(), limits);
                     }
                 }
-                for(URLTemplateType rUrl:layer.getResourceURL()) {
-                    if(rUrl.getResourceType().equalsIgnoreCase("tile")){
-                        if(rUrl.isSetFormat()) {
+                for (URLTemplateType rUrl : layer.getResourceURL()) {
+                    if (rUrl.getResourceType().equalsIgnoreCase("tile")) {
+                        if (rUrl.isSetFormat()) {
                             wLayer.setFormat(rUrl.getFormat());
                         }
                         wLayer.setTemplate(rUrl.getTemplate());
@@ -163,7 +166,7 @@ public class GetCapabilitiesRequest {
                     break;
                     // TODO: handle other languages
                 }
-                ret.add(wLayer);
+                ret.put(wLayer.getName(), wLayer);
             }
             for (TileMatrixSet ts : caps.getContents().getTileMatrixSet()) {
                 org.geotools.tile.impl.wmts.TileMatrixSet tms = new org.geotools.tile.impl.wmts.TileMatrixSet();
@@ -183,6 +186,7 @@ public class GetCapabilitiesRequest {
                     matrices.add(tm);
                 }
                 tms.setMatrices(matrices);
+                tileMatrixSets.put(tms.getIdentifier(), tms);
             }
         }
 
@@ -205,7 +209,7 @@ public class GetCapabilitiesRequest {
         WMTSOperationType ret = new WMTSOperationType();
         OperationsMetadata ops = caps.getOperationsMetadata();
         if (ops == null) {
-            //probably a RESTFul service
+            // probably a RESTFul service
             return null;
         } else {
             for (Operation op : ops.getOperation()) {
@@ -249,5 +253,12 @@ public class GetCapabilitiesRequest {
             }
             return ret;
         }
+    }
+
+    /**
+     * @return the tileMatrixSets
+     */
+    public HashMap<String, org.geotools.tile.impl.wmts.TileMatrixSet> getTileMatrixSets() {
+        return tileMatrixSets;
     }
 }

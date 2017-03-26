@@ -14,29 +14,34 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.wmts;
+package org.geotools.data.wmts;
 
-import org.geotools.data.ows.OperationType;
-import org.geotools.tile.impl.wmts.WMTSServiceType;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.geotools.tile.impl.wmts.TileMatrix;
+import org.geotools.tile.impl.wmts.TileMatrixSet;
 
 /**
  * @author ian
  *
  */
-public class WMTSOperationType extends OperationType {
-    WMTSServiceType type;
-
+public class WMTSServer {
+    GetCapabilities capabilities;
     /**
-     * @return the type
+     * 
      */
-    public WMTSServiceType getType() {
-        return type;
+    public WMTSServer(HashMap<String, String> map) {
+        capabilities = new GetCapabilities(map);
+        WMTSOperationType getTile = capabilities.getGetTile();
+        getTile.getType();
     }
 
-    /**
-     * @param kvp
-     */
-    public void setType(WMTSServiceType kvp) {
-       type=kvp;
+    public TileMatrixSet getTileMatrix(String setName) {
+        return capabilities.getTileMatracies().get(setName);
+    }
+ 
+    public Map<String, TileMatrixSet> getTileMatrixForCRS(String crs) {
+        return capabilities.getTileMatracies(crs);
     }
 }
