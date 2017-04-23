@@ -1,12 +1,15 @@
 package org.geotools.map;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,8 +41,10 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * A grid coverage readers backing onto a WMTS server by issuing GetTile requests
@@ -51,7 +56,8 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             .getLogger("org.geotools.map");
 
     static GridCoverageFactory gcf = new GridCoverageFactory();
-
+    /** Resolution in DPI */
+    private double resolution = 96;
     /**
      * The WMS server
      */
@@ -287,25 +293,19 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine("Issuing request: " + mapRequest.getTiles());
             }
-            InputStream is = null;
+            
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Set<Tile> responses = wmts.issueRequest(mapRequest);
-            for (Tile response : responses) {
-                try {
-                    
-                    BufferedImage tileImage = response.getBufferedImage();
-                    if (tileImage == null) {
-                        LOGGER.fine("GetTile failed: " + response.getId());
-                        continue;
-                    }
-                    //TODO: is this right?
-                    image.setData(tileImage.getRaster());
-                    //add to image!
-                } finally {
-                    IOUtils.closeQuietly(is);
-                    response.dispose();
-                }
-            }
+            double xscale = width / requestedEnvelope.getWidth();
+            double yscale = height / requestedEnvelope.getHeight();
+
+            double scale = Math.min(xscale, yscale);
+
+            double xoff = requestedEnvelope.getMedian(0) * scale - width/2;
+            double yoff = requestedEnvelope.getMedian(1) * scale + height/2;
+
+            AffineTransform worldToScreen = new AffineTransform(scale, 0, 0, -scale, -xoff, yoff);
+            renderTiles(responses, image.createGraphics(), requestedEnvelope, worldToScreen);
             
             return gcf.create(layer.getTitle(), image, gridEnvelope);
         } catch (ServiceException e) {
@@ -313,6 +313,57 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         }
         
     }
+    protected void renderTiles(Collection<Tile> tiles, Graphics2D g2d,
+            ReferencedEnvelope viewportExtent,
+            AffineTransform worldToImageTransform) {
+
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        double[] points = new double[4];
+
+        for (Tile tile : tiles) {
+            ReferencedEnvelope nativeTileEnvelope = tile.getExtent();
+
+            ReferencedEnvelope tileEnvViewport;
+            try {
+                tileEnvViewport = nativeTileEnvelope.transform(
+                        viewportExtent.getCoordinateReferenceSystem(), true);
+            } catch (TransformException | FactoryException e) {
+                throw new RuntimeException(e);
+            }
+
+            points[0] = tileEnvViewport.getMinX();
+            points[3] = tileEnvViewport.getMinY();
+            points[2] = tileEnvViewport.getMaxX();
+            points[1] = tileEnvViewport.getMaxY();
+
+            worldToImageTransform.transform(points, 0, points, 0, 2);
+
+            renderTile(tile, g2d, points);
+
+        }
+
+    }
+
+    protected void renderTile(Tile tile, Graphics2D g2d, double[] points) {
+
+        BufferedImage img = getTileImage(tile);
+        if(img==null) {
+            LOGGER.fine("couldn't draw "+tile.getId());
+            return;
+        }
+        g2d.drawImage(img, (int) points[0], (int) points[1],
+                (int) Math.ceil(points[2] - points[0]),
+                (int) Math.ceil(points[3] - points[1]), null);
+    }
+
+    protected BufferedImage getTileImage(Tile tile) {
+
+        return tile.getBufferedImage();
+
+    }
+
 
     /**
      * Sets up a max request with the provided parameters, making sure it is compatible with the layers own native SRS list

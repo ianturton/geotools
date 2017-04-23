@@ -9,7 +9,7 @@
 		<version>18-SNAPSHOT</version>
 	</parent>
 	<artifactId>gt-wmts</artifactId>
-	<name>gt-wmts</name>
+	<name>Web Map Tile Service Client</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
