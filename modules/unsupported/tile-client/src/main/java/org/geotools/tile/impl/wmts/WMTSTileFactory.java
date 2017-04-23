@@ -16,10 +16,13 @@
  */
 package org.geotools.tile.impl.wmts;
 
+import java.util.logging.Logger;
+
 import org.geotools.tile.Tile;
 import org.geotools.tile.TileFactory;
 import org.geotools.tile.TileService;
 import org.geotools.tile.impl.ZoomLevel;
+import org.geotools.util.logging.Logging;
 
 /**
  * Implementation of TileFactory for WMTS
@@ -28,7 +31,8 @@ import org.geotools.tile.impl.ZoomLevel;
  *
  */
 public class WMTSTileFactory extends TileFactory {
-
+    private static final Logger LOGGER = Logging.getLogger(WMTSTileFactory.class
+            .getPackage().getName());
     /**
      * 
      */
@@ -42,12 +46,18 @@ public class WMTSTileFactory extends TileFactory {
 
         lat = TileFactory.normalizeDegreeValue(lat, 90);
         lon = TileFactory.normalizeDegreeValue(lon, 180);
-        System.out.println(lat + "," + lon);
-        int xTile = (int) Math.floor((lon + 180) / 360 * (1 << zoomLevel.getZoomLevel()));
-        int yTile = (int) Math.floor(
-                (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180))
-                        / Math.PI) / 2 * (1 << zoomLevel.getZoomLevel()));
-
+        
+        int i = 1 << zoomLevel.getZoomLevel(); // 2 to the power zoom
+        int xTile = (int) Math.floor((lon + 180) / 360 * i);
+        double a = lat * Math.PI / 180; // latitude in rads
+        int yTile;
+        if (lat == 90) {
+            yTile = 0;
+        } else {
+            yTile = (int) Math
+                    .floor((1 - Math.log(Math.tan(a) + 1 / Math.cos(a)) / Math.PI) / 2 * i);
+        }
+        LOGGER.fine("fetching tile: " + xTile + " " + yTile + " " + zoomLevel.getZoomLevel());
         return new WMTSTile(xTile, yTile, zoomLevel, service);
     }
 

@@ -5,7 +5,16 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 
-import net.opengis.wmts.v_11.wmts11Factory;		
+import net.opengis.ows11.OnlineResourceType;
+import net.opengis.ows11.OperationsMetadataType;
+import net.opengis.ows11.ServiceIdentificationType;
+import net.opengis.ows11.ServiceProviderType;
+import net.opengis.wmts.v_11.CapabilitiesType;
+import net.opengis.wmts.v_11.ContentsType;
+import net.opengis.wmts.v_11.ThemeType;
+import net.opengis.wmts.v_11.wmts11Factory;
+
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -79,7 +88,7 @@ public class _CapabilitiesBinding extends AbstractComplexBinding {
 	 * @generated modifiable
 	 */	
 	public Class getType() {
-		return null;
+		return CapabilitiesType.class;
 	}
 	
 	/**
@@ -90,9 +99,19 @@ public class _CapabilitiesBinding extends AbstractComplexBinding {
 	 */	
 	public Object parse(ElementInstance instance, Node node, Object value) 
 		throws Exception {
-		
-		//TODO: implement and remove call to super
-		return super.parse(instance,node,value);
-	}
+            CapabilitiesType capabilities = factory.createCapabilitiesType();
+            capabilities.setContents((ContentsType) node.getChildValue(ContentsType.class));
+            capabilities.getThemes().addAll(node.getChildren(ThemeType.class));
+            capabilities.setOperationsMetadata((OperationsMetadataType) node.getChildValue(OperationsMetadataType.class));
+            capabilities.setServiceIdentification((ServiceIdentificationType) node.getChildValue(ServiceIdentificationType.class));
+            capabilities.setServiceProvider((ServiceProviderType) node.getChildValue(ServiceProviderType.class));
+            capabilities.setUpdateSequence((String) node.getChildValue("UpdateSequence"));
+            
+            List<Node> children = node.getChildren("ServiceMetadataURL");
+            for(Node c:children) {
+                capabilities.getServiceMetadataURL().add((OnlineResourceType) c.getValue());
+            }
+            capabilities.getWSDL().addAll(node.getChildren("WSDL"));
+            return capabilities;	}
 
 }

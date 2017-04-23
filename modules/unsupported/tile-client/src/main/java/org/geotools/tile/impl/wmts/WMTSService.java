@@ -18,6 +18,7 @@ package org.geotools.tile.impl.wmts;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -50,6 +51,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * A tile service for WMTS servers.
+ * This is tied to a single layer and style.
  * 
  * @author ian
  *
@@ -66,7 +68,9 @@ public class WMTSService extends TileService {
     private double[] scaleList;
 
     private TileMatrixSet matrixSet;
-
+    
+    
+    
     private String layerName;
 
     private String styleName = ""; // Default style is ""
@@ -76,6 +80,8 @@ public class WMTSService extends TileService {
     private String templateURL;
 
     private WMTSServiceType type = WMTSServiceType.REST;
+
+    private String format = "image/png";
 
     /**
      * 
@@ -89,7 +95,23 @@ public class WMTSService extends TileService {
         setType(type);
         setTileMatrixSetName(tileMatrixSetName);
     }
-
+    /** create a service directly with out parsing the capabilties again.
+     * 
+     * @param requestURL - where to ask for tiles
+     * @param type - KVP or REST
+     * @param layerName - name of the layer to request
+     * @param styleName - name of the style to use?
+     * @param tileMatrixSetName - matrixset name
+     */
+    public WMTSService(String templateURL, WMTSServiceType type, String layerName, String styleName, TileMatrixSet tileMatrixSet) {
+        super("wmts",templateURL);
+        setTemplateURL(templateURL);
+        setLayerName(layerName);
+        setStyleName(styleName);
+        setType(type);
+        setMatrixSet(tileMatrixSet);
+        setTileMatrixSetName(tileMatrixSet.getIdentifier());
+    }
     /**
      * @return the type
      */
@@ -198,10 +220,14 @@ public class WMTSService extends TileService {
 
         this.tileMatrixSetName = tileMatrixSetName;
         if (WMTSServiceType.REST.equals(type)) {
-            extractRestTileMatrixSet();
+            if(matrixSet==null) {
+                extractRestTileMatrixSet();
+            }
         }
         if (WMTSServiceType.KVP.equals(type)) {
-            extractKVPTileMatrixSet();
+            if(matrixSet==null) {
+                extractKVPTileMatrixSet();
+            }
         }
     }
 
@@ -426,6 +452,36 @@ public class WMTSService extends TileService {
      */
     public TileMatrix getTileMatrix(int zoomLevel) {
         return matrixSet.getMatrices().get(zoomLevel);
+    }
+    /**
+     * @return the matrixSet
+     */
+    public TileMatrixSet getMatrixSet() {
+        return matrixSet;
+    }
+    /**
+     * @param matrixSet the matrixSet to set
+     */
+    public void setMatrixSet(TileMatrixSet matrixSet) {
+        this.matrixSet = matrixSet;
+        scaleList = new double[matrixSet.size()];
+        int j = 0;
+        for (TileMatrix tm : matrixSet.getMatrices()) {
+            scaleList[j++] = tm.getDenominator();
+        }
+    }
+    /**
+     * @return
+     */
+    public String getFormat() {
+        // TODO Auto-generated method stub
+        return format;
+    }
+    /**
+     * @param format the format to set
+     */
+    public void setFormat(String format) {
+        this.format = format;
     }
 
 }

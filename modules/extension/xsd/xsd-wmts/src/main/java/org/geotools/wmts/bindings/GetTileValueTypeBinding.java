@@ -5,6 +5,7 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractSimpleBinding;
 
+import net.opengis.wmts.v_11.GetTileType;
 import net.opengis.wmts.v_11.wmts11Factory;		
 
 import javax.xml.namespace.QName;
@@ -49,7 +50,7 @@ public class GetTileValueTypeBinding extends AbstractSimpleBinding {
 	 * @generated modifiable
 	 */	
 	public Class getType() {
-		return null;
+		return GetTileType.class;
 	}
 	
 	/**

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated wmts11 -->
+      <package
+            uri="http://www.opengis.net/gml"
+            class="net.opengis.gml.GmlPackage"
+            genModel="wmts11.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated wmts11 -->
+      <parser
+            type="gml"
+            class="net.opengis.gml.util.GmlResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated wmts11 -->
+      <package
+            uri="http://www.w3.org/2001/SMIL20/"
+            class="org.w3._2001.smil20.Smil20Package"
+            genModel="wmts11.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated wmts11 -->
+      <parser
+            type="smil20"
+            class="org.w3._2001.smil20.util.Smil20ResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated wmts11 -->
+      <package
+            uri="http://www.w3.org/2001/SMIL20/Language"
+            class="org.w3._2001.smil20.language.LanguagePackage"
+            genModel="wmts11.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated wmts11 -->
+      <parser
+            type="language"
+            class="org.w3._2001.smil20.language.util.LanguageResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated wmts11 -->
+      <package
+            uri="http://www.opengis.net/wmts/1.0"
+            class="net.opengis.wmts.v_11.wmts11Package"
+            genModel="wmts11.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated wmts11 -->
+      <parser
+            type="wmts11"
+            class="net.opengis.wmts.v_11.util.wmts11ResourceFactoryImpl"/>
+   </extension>
+
+</plugin>

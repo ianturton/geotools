@@ -8,6 +8,9 @@ import net.opengis.wmts.v_11.TileMatrixLimitsType;
 import net.opengis.wmts.v_11.TileMatrixSetLimitsType;
 import net.opengis.wmts.v_11.wmts11Factory;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 /**
@@ -77,9 +80,13 @@ public class TileMatrixSetLimitsBinding extends AbstractSimpleBinding {
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
 
         TileMatrixSetLimitsType limits = factory.createTileMatrixSetLimitsType();
-        
-        limits.getTileMatrixLimits().addAll(node.getChildren("TileMatrixSetLimits"));
-        
+
+        @SuppressWarnings("unchecked")
+        List<Node> children = node.getChildren("TileMatrixSetLimits");
+        for (Node c : children) {
+
+            limits.getTileMatrixLimits().add((TileMatrixLimitsType) c);
+        }
         return limits;
     }
 

@@ -1,6 +1,5 @@
 package org.geotools.wmts.bindings;
 
-
 import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
@@ -10,7 +9,9 @@ import net.opengis.ows20.DatasetDescriptionSummaryBaseType;
 import net.opengis.ows20.MetadataType;
 import net.opengis.wmts.v_11.ContentsType;
 import net.opengis.wmts.v_11.TileMatrixSetType;
-import net.opengis.wmts.v_11.wmts11Factory;		
+import net.opengis.wmts.v_11.wmts11Factory;
+
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -18,7 +19,8 @@ import javax.xml.namespace.QName;
  * Binding object for the type http://www.opengis.net/wmts/1.0:ContentsType.
  *
  * <p>
- *	<pre>
+ * 
+ * <pre>
  *	 <code>
  *  &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;complexType name="ContentsType" xmlns="http://www.w3.org/2001/XMLSchema"&gt;
  *  		&lt;complexContent&gt;
@@ -35,49 +37,60 @@ import javax.xml.namespace.QName;
  *  	&lt;/complexType&gt; 
  *		
  *	  </code>
- *	 </pre>
+ * </pre>
  * </p>
  *
  * @generated
  */
 public class ContentsTypeBinding extends AbstractComplexBinding {
 
-	wmts11Factory factory;		
-	public ContentsTypeBinding( wmts11Factory factory ) {
-		super();
-		this.factory = factory;
-	}
+    wmts11Factory factory;
 
-	/**
-	 * @generated
-	 */
-	public QName getTarget() {
-		return WMTS.ContentsType;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Class getType() {
-		return ContentsTypeBinding.class;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Object parse(ElementInstance instance, Node node, Object value) 
-		throws Exception {
-		ContentsType contents = factory.createContentsType();
-		contents.getDatasetDescriptionSummary().addAll(node.getChildren(DatasetDescriptionSummaryBaseType.class));
-		contents.getTileMatrixSet().addAll(node.getChildren(TileMatrixSetType.class));
-		contents.getOtherSource().addAll(node.getChildren(MetadataType.class));
-		return contents;
-	}
+    public ContentsTypeBinding(wmts11Factory factory) {
+        super();
+        this.factory = factory;
+    }
+
+    /**
+     * @generated
+     */
+    public QName getTarget() {
+        return WMTS.ContentsType;
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
+     * @generated modifiable
+     */
+    public Class getType() {
+        return ContentsTypeBinding.class;
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
+     * @generated modifiable
+     */
+    @SuppressWarnings("unchecked")
+    public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
+        ContentsType contents = factory.createContentsType();
+        
+        List<Node> children = node.getChildren("Layer");
+        for (Node c : children) {
+            contents.getDatasetDescriptionSummary().add(c.getValue());
+        }
+
+        List<Node> children1 = node.getChildren("TileMatrixSet");
+        for (Node c : children1) {
+            contents.getTileMatrixSet().add((TileMatrixSetType) c.getValue());
+        }
+        
+        List<Node> children2 = node.getChildren(MetadataType.class);
+        for (Node c : children2) {
+            contents.getOtherSource().add(c.getValue());
+        }
+        return contents;
+    }
 
 }

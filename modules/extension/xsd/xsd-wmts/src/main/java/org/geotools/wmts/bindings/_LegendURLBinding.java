@@ -5,7 +5,10 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 
-import net.opengis.wmts.v_11.wmts11Factory;		
+import net.opengis.wmts.v_11.LegendURLType;
+import net.opengis.wmts.v_11.wmts11Factory;
+
+import java.math.BigInteger;
 
 import javax.xml.namespace.QName;
 
@@ -79,7 +82,7 @@ public class _LegendURLBinding extends AbstractComplexBinding {
 	 * @generated modifiable
 	 */	
 	public Class getType() {
-		return null;
+		return LegendURLType.class;
 	}
 	
 	/**
@@ -90,9 +93,22 @@ public class _LegendURLBinding extends AbstractComplexBinding {
 	 */	
 	public Object parse(ElementInstance instance, Node node, Object value) 
 		throws Exception {
-		
-		//TODO: implement and remove call to super
-		return super.parse(instance,node,value);
+	    LegendURLType legendURL = factory.createLegendURLType();
+            legendURL.setFormat((String) node.getChildValue("format"));
+            legendURL.setHeight((BigInteger) node.getChildValue("height"));
+            legendURL.setWidth((BigInteger) node.getChildValue("width"));
+            legendURL.setHref((String) node.getChildValue("Href"));
+            Object childValue = node.getChildValue("maxScaleDenominator");
+            if(childValue!=null) {
+                legendURL.setMaxScaleDenominator(((Double) childValue).doubleValue());
+            }
+            childValue = node.getChildValue("minScaleDenominator");
+            if(childValue!=null) {
+                legendURL.setMinScaleDenominator(((Double) childValue).doubleValue());
+            }
+            
+            
+            return legendURL;
 	}
 
 }

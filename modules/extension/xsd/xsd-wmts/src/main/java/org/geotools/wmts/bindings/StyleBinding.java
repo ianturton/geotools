@@ -5,8 +5,11 @@ import org.geotools.xml.*;
 import org.geotools.xml.AbstractSimpleBinding;
 
 import net.opengis.ows11.CodeType;
+import net.opengis.wmts.v_11.LegendURLType;
 import net.opengis.wmts.v_11.StyleType;
 import net.opengis.wmts.v_11.wmts11Factory;
+
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -83,17 +86,30 @@ public class StyleBinding extends AbstractSimpleBinding {
      * 
      * @generated modifiable
      */
+   
+    @SuppressWarnings("unchecked")
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
         StyleType style = factory.createStyleType();
-        
+
         style.setIdentifier((CodeType) node.getChildValue("Identifier"));
         style.setIsDefault((boolean) node.getAttributeValue("default"));
-        style.getLegendURL().addAll(node.getChildren("LegendURL"));
-        style.getKeywords().addAll(node.getChildren("Keywords"));
-        style.getTitle().addAll(node.getChildren("title"));
-        style.getAbstract().addAll(node.getChildren("Abstract"));
-        
-        
+        List<Node> children = node.getChildren("LegendURL");
+        for (Node c : children) {
+            style.getLegendURL().add((LegendURLType) c.getValue());
+        }
+        List<Node> children2 = node.getChildren("Keywords");
+        for(Node c:children2) {
+            style.getKeywords().add(c.getValue());
+        }
+        List<Node> children3 = node.getChildren("title");
+        for(Node c:children3) {
+            style.getTitle().add(c.getValue());
+        }
+        List<Node> children4 = node.getChildren("Abstract");
+        for(Node c:children4) {
+            style.getAbstract().add(c.getValue());
+        }
+
         return style;
     }
 

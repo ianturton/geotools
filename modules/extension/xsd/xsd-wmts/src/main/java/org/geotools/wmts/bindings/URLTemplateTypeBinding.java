@@ -5,6 +5,8 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 
+import net.opengis.wmts.v_11.ResourceTypeType;
+import net.opengis.wmts.v_11.URLTemplateType;
 import net.opengis.wmts.v_11.wmts11Factory;		
 
 import javax.xml.namespace.QName;
@@ -80,7 +82,7 @@ public class URLTemplateTypeBinding extends AbstractComplexBinding {
 	 * @generated modifiable
 	 */	
 	public Class getType() {
-		return null;
+		return URLTemplateType.class;
 	}
 	
 	/**
@@ -91,9 +93,12 @@ public class URLTemplateTypeBinding extends AbstractComplexBinding {
 	 */	
 	public Object parse(ElementInstance instance, Node node, Object value) 
 		throws Exception {
-		
-		//TODO: implement and remove call to super
-		return super.parse(instance,node,value);
+	    URLTemplateType template = factory.createURLTemplateType();
+	    template.setFormat((String) node.getAttributeValue("format"));
+	    //TODO: find resourceType binding?
+	   // template.setResourceType((String) node.getAttributeValue("resourceType"));
+	    template.setTemplate((String) node.getAttributeValue("template"));
+	    return template;
 	}
 
 }

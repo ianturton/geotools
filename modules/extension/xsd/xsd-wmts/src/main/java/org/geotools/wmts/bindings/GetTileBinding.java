@@ -4,11 +4,13 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractSimpleBinding;
 
+import net.opengis.wmts.v_11.DimensionNameValueType;
 import net.opengis.wmts.v_11.DimensionType;
 import net.opengis.wmts.v_11.GetTileType;
 import net.opengis.wmts.v_11.wmts11Factory;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -116,7 +118,10 @@ public class GetTileBinding extends AbstractSimpleBinding {
         getTile.setTileRow((BigInteger) node.getChildValue("TileRow"));
         getTile.setTileMatrix((String) node.getChildValue("TileMatrix"));
         getTile.setTileMatrixSet((String) node.getChildValue("TileMatrixSet"));
-        getTile.getDimensionNameValue().addAll(node.getChildren(DimensionType.class));
+        List<Node> children = node.getChildren(DimensionType.class);
+        for(Node c:children) {  
+            getTile.getDimensionNameValue().add((DimensionNameValueType) c.getValue());
+        }
         
         return getTile;
     }

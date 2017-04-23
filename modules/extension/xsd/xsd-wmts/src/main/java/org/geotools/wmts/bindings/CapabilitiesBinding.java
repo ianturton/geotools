@@ -120,7 +120,12 @@ public class CapabilitiesBinding extends AbstractSimpleBinding {
 		capabilities.setServiceIdentification((ServiceIdentificationType) node.getChildValue(ServiceIdentificationType.class));
 		capabilities.setServiceProvider((ServiceProviderType) node.getChildValue(ServiceProviderType.class));
 		capabilities.setUpdateSequence((String) node.getChildValue("UpdateSequence"));
-		capabilities.setVersion((String)node.getChildValue("version"));
+		String childValue = (String)node.getChildValue("ServiceTypeVersion");
+		if(childValue!=null) {
+		    capabilities.setVersion(childValue);
+		}else {
+		    capabilities.setVersion("1.0.1");
+		}
 		capabilities.getServiceMetadataURL().addAll(node.getChildren("ServiceMetadataURL"));
 		capabilities.getWSDL().addAll(node.getChildren("WSDL"));
 		return capabilities;

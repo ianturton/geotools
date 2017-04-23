@@ -2,12 +2,15 @@ package org.geotools.wmts.bindings;
 
 import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
-import org.geotools.xml.AbstractSimpleBinding;
 
 import net.opengis.ows11.BoundingBoxType;
 import net.opengis.ows11.CodeType;
 import net.opengis.wmts.v_11.TileMatrixSetType;
+import net.opengis.wmts.v_11.TileMatrixType;
 import net.opengis.wmts.v_11.wmts11Factory;
+
+import java.net.URI;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -106,14 +109,19 @@ public class TileMatrixSetBinding extends AbstractSimpleBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
         TileMatrixSetType matrixSet = factory.createTileMatrixSetType();
-        matrixSet.setBoundingBox((BoundingBoxType) node.getChild("BoundingBox"));
-        matrixSet.setIdentifier((CodeType) node.getChild("Identifier"));
-        matrixSet.setSupportedCRS((String)node.getChildValue("SupportedCRS"));
-        matrixSet.setWellKnownScaleSet((String)node.getChildValue("WellKnownScaleSet"));
+        matrixSet.setBoundingBox((BoundingBoxType) node.getChildValue("BoundingBox"));
+        matrixSet.setIdentifier((CodeType) node.getChildValue("Identifier"));
+        matrixSet.setSupportedCRS(((URI) node.getChildValue("SupportedCRS")).toString());
+        matrixSet.setWellKnownScaleSet((String) node.getChildValue("WellKnownScaleSet"));
         matrixSet.getAbstract().addAll(node.getChildren("abstract"));
-        matrixSet.getTileMatrix().addAll(node.getChildren("TileMatrix"));
-        
+        List<Node> children = node.getChildren("TileMatrix");
+        for(Node c:children) {
+            matrixSet.getTileMatrix().add((TileMatrixType) c.getValue());
+        }
+
         return matrixSet;
+        
+       
     }
 
 }

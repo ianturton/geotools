@@ -194,7 +194,7 @@ public abstract class Tile implements ImageLoader {
             setRenderState(RenderState.RENDERED);
 
             return this.tileImage;
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load image: " + this.getUrl(),
                     e);
             setRenderState(RenderState.INVALID);

@@ -5,7 +5,12 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 
-import net.opengis.wmts.v_11.wmts11Factory;		
+import net.opengis.ows11.CodeType;
+import net.opengis.wmts.v_11.TileMatrixType;
+import net.opengis.wmts.v_11.wmts11Factory;
+
+import java.math.BigInteger;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -92,7 +97,7 @@ public class _TileMatrixBinding extends AbstractComplexBinding {
 	 * @generated modifiable
 	 */	
 	public Class getType() {
-		return null;
+		return TileMatrixType.class;
 	}
 	
 	/**
@@ -103,9 +108,15 @@ public class _TileMatrixBinding extends AbstractComplexBinding {
 	 */	
 	public Object parse(ElementInstance instance, Node node, Object value) 
 		throws Exception {
-		
-		//TODO: implement and remove call to super
-		return super.parse(instance,node,value);
+	    TileMatrixType tileMatrix = factory.createTileMatrixType();
+	        tileMatrix.setIdentifier((CodeType) node.getChildValue("Identifier"));
+	        tileMatrix.setMatrixHeight((BigInteger) node.getChildValue("MatrixHeight"));
+	        tileMatrix.setMatrixWidth((BigInteger) node.getChildValue("MatrixWidth"));
+	        tileMatrix.setScaleDenominator((double) node.getChildValue("ScaleDenominator"));
+	        tileMatrix.setTileHeight((BigInteger) node.getChildValue("TileHeight"));
+	        tileMatrix.setTileWidth((BigInteger) node.getChildValue("TileWidth"));
+	        tileMatrix.setTopLeftCorner((List<Double>) node.getChildValue("TopLeftCorner"));
+	        return tileMatrix;
 	}
 
 }

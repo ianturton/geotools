@@ -84,9 +84,10 @@ public class WMTSTile extends Tile {
         String baseUrl = new String(service.getTemplateURL());
         
         TileIdentifier tileIdentifier = getTileIdentifier();
-        if (WMTSServiceType.KVP == type) {
+        if (WMTSServiceType.KVP.equals(type)) {
+            //in theory it should end with ? but there may be other params that the server needs out of spec
             if(!baseUrl.contains("?")) { 
-                //in theory it should end with ? but there may be other params that the server needs out of spec 
+                
                 baseUrl+="?";
             }
             HashMap<String, Object> params = new HashMap<>();
@@ -95,7 +96,7 @@ public class WMTSTile extends Tile {
             params.put("request", "getTile");
             params.put("layer",service.getLayerName());
             params.put("style",service.getStyleName());
-            params.put("format","image/png");
+            params.put("format",service.getFormat());
             params.put("tilematrixset", service.getTileMatrixSetName());
             params.put("TileMatrix", service.getTileMatrixSetName()+":"+tileIdentifier.getZ());
             params.put("TileCol", tileIdentifier.getX());
@@ -116,7 +117,7 @@ public class WMTSTile extends Tile {
                 //I'm pretty sure this never happens!
                 throw new RuntimeException(e);
             } 
-        } else if (WMTSServiceType.REST == type) {
+        } else if (WMTSServiceType.REST.equals(type)) {
             
             baseUrl = baseUrl.replace("{TileMatrixSet}", service.getTileMatrixSetName());
             baseUrl = baseUrl.replace("{TileMatrix}", "" + tileIdentifier.getZ());

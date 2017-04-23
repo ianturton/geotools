@@ -1,19 +1,24 @@
 package org.geotools.wmts.bindings;
 
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.geotools.wmts.WMTS;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 import net.opengis.ows11.CodeType;
-import net.opengis.ows20.DatasetDescriptionSummaryBaseType;
-import net.opengis.ows20.MetadataType;
+import net.opengis.ows11.DatasetDescriptionSummaryBaseType;
+import net.opengis.ows11.MetadataType;
+
 import net.opengis.wmts.v_11.DimensionType;
 import net.opengis.wmts.v_11.LayerType;
+import net.opengis.wmts.v_11.StyleType;
 import net.opengis.wmts.v_11.TileMatrixSetLinkType;
 import net.opengis.wmts.v_11.URLTemplateType;
 import net.opengis.wmts.v_11.wmts11Factory;
-
-import javax.xml.namespace.QName;
 
 /**
  * Binding object for the type http://www.opengis.net/wmts/1.0:LayerType.
@@ -94,7 +99,7 @@ public class LayerTypeBinding extends AbstractComplexBinding {
      * 
      * @generated modifiable
      */
-    public Class getType() {
+    public Class<LayerType> getType() {
         return LayerType.class;
     }
 
@@ -103,24 +108,58 @@ public class LayerTypeBinding extends AbstractComplexBinding {
      * 
      * @generated modifiable
      */
+    @SuppressWarnings("unchecked")
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
         LayerType layer = factory.createLayerType();
-
-        layer.getAbstract().addAll(node.getChildren("Abstract"));
-        layer.getBoundingBox().addAll(node.getChildren("BoundingBox"));
-        layer.getWGS84BoundingBox().addAll(node.getChildren("WGS84BoundingBox"));
+        List<Node> children;
+        children = node.getChildren("Abstract");
+        for (Node c : children) {
+            layer.getAbstract().add(c.getValue());
+        }
+        children = node.getChildren("BoundingBox");
+        for (Node c : children) {
+            layer.getBoundingBox().add(c.getValue());
+        }
+        layer.getWGS84BoundingBox().add(node.getChildValue("WGS84BoundingBox"));
         layer.getDatasetDescriptionSummary()
                 .addAll(node.getChildren(DatasetDescriptionSummaryBaseType.class));
         layer.getDimension().addAll(node.getChildren(DimensionType.class));
-        layer.getFormat().addAll(node.getChildren("Format"));
-        layer.getInfoFormat().addAll(node.getChildren("InfoFormat"));
-        layer.setIdentifier((CodeType) node.getChild("Identifier"));
-        layer.getKeywords().addAll(node.getChildren("Keyword"));
-        layer.getMetadata().addAll(node.getChildren(MetadataType.class));
-        layer.getResourceURL().addAll(node.getChildren(URLTemplateType.class));
-        layer.getStyle().addAll(node.getChildren("Style"));
-        layer.getTileMatrixSetLink().addAll(node.getChildren(TileMatrixSetLinkType.class));
-        layer.getTitle().addAll(node.getChildren("Title"));
+        children = node.getChildren("Format");
+        for (Node c : children) {
+            layer.getFormat().add((String) c.getValue());
+        }
+
+        children = node.getChildren("InfoFormat");
+        for (Node c : children) {
+            layer.getInfoFormat().add((String) c.getValue());
+        }
+        
+        layer.setIdentifier((CodeType) node.getChildValue("Identifier"));
+        List<Node> children3 = node.getChildren("Keyword");
+        for(Node c:children3) {
+            layer.getKeywords().add(c.getValue());
+        }
+        children3 = node.getChildren(MetadataType.class);
+        for(Node c:children3) {
+            layer.getMetadata().add(c.getValue());
+        }
+        children3 = node.getChildren("ResourceURL");
+        for (Node c : children3) {
+            layer.getResourceURL().add((URLTemplateType) c.getValue());
+        }
+        children = node.getChildren("Style");
+        for (Node c : children) {
+            layer.getStyle().add((StyleType) c.getValue());
+        }
+
+        List<Node> children2 = node.getChildren("TileMatrixSetLink");
+        for (Node c : children2) {
+            layer.getTileMatrixSetLink().add((TileMatrixSetLinkType) c.getValue());
+        }
+        children = node.getChildren("Title");
+        for (Node c : children) {
+            layer.getTitle().add(c.getValue());
+        }
 
         return layer;
     }

@@ -80,7 +80,7 @@ public class TileMatrixSetLinkBinding extends AbstractSimpleBinding {
         TileMatrixSetLinkType link = factory.createTileMatrixSetLinkType();
         
         link.setTileMatrixSet((String) node.getChildValue("TileMatrixSet"));
-        link.setTileMatrixSetLimits((TileMatrixSetLimitsType) node.getChild("TileMatrixSetLimits"));
+        link.setTileMatrixSetLimits((TileMatrixSetLimitsType) node.getChildValue("TileMatrixSetLimits"));
         return link;
     
     }

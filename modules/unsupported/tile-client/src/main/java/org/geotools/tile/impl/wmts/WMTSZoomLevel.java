@@ -30,7 +30,7 @@ public class WMTSZoomLevel extends ZoomLevel {
      * @param zoomLevel
      */
     public WMTSZoomLevel(int zoomLevel, WMTSService service) {
-        // super(zoomLevel);
+        //super(zoomLevel);
         this.service = service;
         setZoomLevel(zoomLevel);
         this.maxTilePerRowNumber = calculateMaxTilePerRowNumber(zoomLevel);
@@ -43,16 +43,18 @@ public class WMTSZoomLevel extends ZoomLevel {
     public int calculateMaxTilePerRowNumber(int zoomLevel) {
 
         TileMatrix matrix = service.getTileMatrix(zoomLevel);
-        System.out.println("Fetching matrix " + zoomLevel + " width " + (matrix.getMatrixWidth()));
+        
         return matrix.getMatrixWidth();
     }
 
     @Override
     public int calculateMaxTilePerColNumber(int zoomLevel) {
         TileMatrix matrix = service.getTileMatrix(zoomLevel);
-        System.out
-                .println("Fetching matrix " + zoomLevel + " height " + (matrix.getMatrixHeight()));
         return matrix.getMatrixHeight();
     }
 
+    public String toString() {
+        return "ZoomLevel "+getZoomLevel()+":"+getMaxTilePerColNumber() +" cols "+getMaxTilePerRowNumber()+" rows";
+        
+    }
 }
