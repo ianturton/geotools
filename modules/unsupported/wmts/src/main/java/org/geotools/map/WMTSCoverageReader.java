@@ -56,8 +56,10 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             .getLogger("org.geotools.map");
 
     static GridCoverageFactory gcf = new GridCoverageFactory();
+
     /** Resolution in DPI */
     private double resolution = 96;
+
     /**
      * The WMS server
      */
@@ -131,7 +133,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         addLayer(layer2);
 
         // best guess at the format with a preference for PNG (since it's normally transparent)
-        List<String> formats = ((WMTSLayer)layer2).getFormats();//wms2.getCapabilities().getRequest().getGetTile().getFormats();
+        List<String> formats = ((WMTSLayer) layer2).getFormats();// wms2.getCapabilities().getRequest().getGetTile().getFormats();
         this.format = formats.iterator().next();
         for (String format : formats) {
             if ("image/png".equals(format) || "image/png24".equals(format) || "png".equals(format)
@@ -140,11 +142,11 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
                 break;
             }
         }
-        
+
     }
 
     void addLayer(org.geotools.data.ows.Layer layer2) {
-        this.layer=(org.geotools.data.wmts.WMTSLayer) layer2;
+        this.layer = (org.geotools.data.wmts.WMTSLayer) layer2;
 
         if (srsName == null) {
             // initialize from first layer
@@ -196,7 +198,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             LOGGER.log(Level.FINE, "Bounds unavailable for layer" + layer2);
         }
         this.crs = crs;
-
+        this.requestCRS = crs;
         // update the cached bounds and the reader original envelope
         updateBounds();
     }
@@ -212,7 +214,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             GetTileRequest getmap) throws IOException {
         GetFeatureInfoRequest request = wmts.createGetFeatureInfoRequest(getmap);
         request.setFeatureCount(1);
-        //request.setQueryLayers(new LinkedHashSet<Layer>(layers));
+        // request.setQueryLayers(new LinkedHashSet<Layer>(layers));
         request.setInfoFormat(infoFormat);
         request.setFeatureCount(featureCount);
         try {
@@ -293,7 +295,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine("Issuing request: " + mapRequest.getTiles());
             }
-            
+
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Set<Tile> responses = wmts.issueRequest(mapRequest);
             double xscale = width / requestedEnvelope.getWidth();
@@ -301,21 +303,21 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
             double scale = Math.min(xscale, yscale);
 
-            double xoff = requestedEnvelope.getMedian(0) * scale - width/2;
-            double yoff = requestedEnvelope.getMedian(1) * scale + height/2;
+            double xoff = requestedEnvelope.getMedian(0) * scale - width / 2;
+            double yoff = requestedEnvelope.getMedian(1) * scale + height / 2;
 
             AffineTransform worldToScreen = new AffineTransform(scale, 0, 0, -scale, -xoff, yoff);
             renderTiles(responses, image.createGraphics(), requestedEnvelope, worldToScreen);
-            
+
             return gcf.create(layer.getTitle(), image, gridEnvelope);
         } catch (ServiceException e) {
             throw (IOException) new IOException("GetMap failed").initCause(e);
         }
-        
+
     }
+
     protected void renderTiles(Collection<Tile> tiles, Graphics2D g2d,
-            ReferencedEnvelope viewportExtent,
-            AffineTransform worldToImageTransform) {
+            ReferencedEnvelope viewportExtent, AffineTransform worldToImageTransform) {
 
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -327,8 +329,8 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
             ReferencedEnvelope tileEnvViewport;
             try {
-                tileEnvViewport = nativeTileEnvelope.transform(
-                        viewportExtent.getCoordinateReferenceSystem(), true);
+                tileEnvViewport = nativeTileEnvelope
+                        .transform(viewportExtent.getCoordinateReferenceSystem(), true);
             } catch (TransformException | FactoryException e) {
                 throw new RuntimeException(e);
             }
@@ -349,12 +351,11 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
     protected void renderTile(Tile tile, Graphics2D g2d, double[] points) {
 
         BufferedImage img = getTileImage(tile);
-        if(img==null) {
-            LOGGER.fine("couldn't draw "+tile.getId());
+        if (img == null) {
+            LOGGER.fine("couldn't draw " + tile.getId());
             return;
         }
-        g2d.drawImage(img, (int) points[0], (int) points[1],
-                (int) Math.ceil(points[2] - points[0]),
+        g2d.drawImage(img, (int) points[0], (int) points[1], (int) Math.ceil(points[2] - points[0]),
                 (int) Math.ceil(points[3] - points[1]), null);
     }
 
@@ -363,7 +364,6 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         return tile.getBufferedImage();
 
     }
-
 
     /**
      * Sets up a max request with the provided parameters, making sure it is compatible with the layers own native SRS list
@@ -410,7 +410,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         }
 
         GetTileRequest mapRequest = wmts.createGetTileRequest();
-        
+
         mapRequest.addLayer(layer, "");
         mapRequest.setDimensions(width, height);
         mapRequest.setFormat(format);
@@ -452,8 +452,8 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
      * @return
      */
     public void updateBounds() {
-        ReferencedEnvelope result = reference(layer.getEnvelope(requestCRS));
-        
+        GeneralEnvelope envelope = layer.getEnvelope(requestCRS);
+        ReferencedEnvelope result = reference(envelope);
 
         this.bounds = result;
         this.originalEnvelope = new GeneralEnvelope(result);

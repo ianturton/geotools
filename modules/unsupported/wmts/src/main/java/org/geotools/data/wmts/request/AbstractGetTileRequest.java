@@ -213,14 +213,14 @@ public abstract class AbstractGetTileRequest extends AbstractWMTSRequest impleme
                 
                 int x = tile.getTileIdentifier().getX();
                 int y = tile.getTileIdentifier().getY();
-                if (x < limit.getMincol() || x >= limit.getMaxcol()) {
+                if (x < limit.getMincol() || x > limit.getMaxcol()) {
                     LOGGER.finest(x + " exceeds col limits " + limit.getMincol() + " "
                             + limit.getMaxcol());
                     remove.add(tile);
                     continue;
                 }
 
-                if (y < limit.getMinrow() || y >= limit.getMaxrow()) {
+                if (y < limit.getMinrow() || y > limit.getMaxrow()) {
                     LOGGER.finest(y + " exceeds row limits " + limit.getMinrow() + " "
                             + limit.getMaxrow());
                     remove.add(tile);
