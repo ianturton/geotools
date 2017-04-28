@@ -49,8 +49,8 @@ public class WMTSCapabilitiesTest extends TestCase {
     protected WMTSSpecification spec;
 
     public WMTSCapabilitiesTest() throws Exception {
-    /*    this.spec = new WMTSSpecification();
-        this.server = new URL("http://maps.boundlessgeo-dev.com/geoserver/gwc/service/wmts?");*/
+        this.spec = new WMTSSpecification();
+        this.server = new URL("http://maps.boundlessgeo-dev.com/geoserver/gwc/service/wmts?");
     }
 
     public void testGetVersion() {

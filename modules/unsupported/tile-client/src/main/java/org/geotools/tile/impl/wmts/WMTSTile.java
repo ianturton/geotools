@@ -27,8 +27,6 @@ import org.geotools.tile.TileService;
 import org.geotools.tile.impl.WebMercatorTileFactory;
 import org.geotools.tile.impl.ZoomLevel;
 
-import org.geotools.util.UnsupportedImplementationException;
-
 /**
  * 
  * Handle information about a WMTS tile

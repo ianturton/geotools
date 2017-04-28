@@ -67,7 +67,7 @@ public class OSMTileFactory extends WebMercatorTileFactory {
      * @param max
      * @return
      */
-    private static double moveInRange(double value, double min, double max) {
+    public static double moveInRange(double value, double min, double max) {
         if (value < min) {
             value = min;
         } else if (value > max) {

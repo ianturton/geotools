@@ -16,20 +16,16 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.IOUtils;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wmts.WMTSLayer;
 import org.geotools.data.wmts.WebMapTileServer;
-import org.geotools.data.wmts.request.GetFeatureInfoRequest;
 import org.geotools.data.wmts.request.GetTileRequest;
-import org.geotools.data.wmts.response.GetFeatureInfoResponse;
-import org.geotools.data.wmts.response.GetTileResponse;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -293,10 +289,12 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         // issue the request and wrap response in a grid coverage
         try {
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("Issuing request: " + mapRequest.getTiles());
+                LOGGER.fine("Issuing request: " + mapRequest.getFinalURL());
             }
 
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            
+            mapRequest.setCRS(gridEnvelope.getCoordinateReferenceSystem());
             Set<Tile> responses = wmts.issueRequest(mapRequest);
             double xscale = width / requestedEnvelope.getWidth();
             double yscale = height / requestedEnvelope.getHeight();
@@ -394,7 +392,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
                 requestSrs = code;
             } else {
                 // first reproject to the map CRS
-                gridEnvelope = bbox.transform(getCrs(), true);
+                gridEnvelope = bbox.transform(getCoordinateReferenceSystem(), true);
 
                 // then adjust the form factor
                 if (gridEnvelope.getWidth() < gridEnvelope.getHeight()) {
@@ -410,7 +408,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         }
 
         GetTileRequest mapRequest = wmts.createGetTileRequest();
-
+        mapRequest.setCRS(gridEnvelope.getCoordinateReferenceSystem());
         mapRequest.addLayer(layer, "");
         mapRequest.setDimensions(width, height);
         mapRequest.setFormat(format);
@@ -431,7 +429,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
         ReferencedEnvelope requestEnvelope = gridEnvelope;
         mapRequest.setBBox(requestEnvelope);
-        mapRequest.setSRS(requestSrs);
+        //mapRequest.setSRS(requestSrs);
 
         this.mapRequest = mapRequest;
         this.requestedEnvelope = gridEnvelope;

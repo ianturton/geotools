@@ -38,6 +38,7 @@ import org.geotools.map.WMTSMapLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.tile.Tile;
 import org.geotools.tile.impl.wmts.WMTSServiceType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author ian
@@ -73,7 +74,7 @@ public class WMTSSpecification extends Specification {
     }
     
     static public class GetTileRequest extends AbstractGetTileRequest{
-
+        
         
         /**
          * @param onlineResource
@@ -115,7 +116,6 @@ public class WMTSSpecification extends Specification {
             this.type = type;
         }
 
- 
        
     }
     

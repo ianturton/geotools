@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -83,6 +84,8 @@ public class WMTSService extends TileService {
 
     private String format = "image/png";
 
+    private List<TileMatrixLimits> limits;
+
     /**
      * 
      * @param name - a name to refer to the layer by.
@@ -94,6 +97,7 @@ public class WMTSService extends TileService {
         setLayerName(layerName);
         setType(type);
         setTileMatrixSetName(tileMatrixSetName);
+        
     }
     /** create a service directly with out parsing the capabilties again.
      * 
@@ -103,8 +107,9 @@ public class WMTSService extends TileService {
      * @param styleName - name of the style to use?
      * @param tileMatrixSetName - matrixset name
      */
-    public WMTSService(String templateURL, WMTSServiceType type, String layerName, String styleName, TileMatrixSet tileMatrixSet) {
+    public WMTSService(String templateURL, WMTSServiceType type, String layerName, String styleName, TileMatrixSet tileMatrixSet, List<TileMatrixLimits> limits) {
         super("wmts",templateURL);
+        this.limits = limits;
         setTemplateURL(templateURL);
         setLayerName(layerName);
         setStyleName(styleName);
@@ -232,8 +237,21 @@ public class WMTSService extends TileService {
     }
 
     /**
-     * 
+     * @return the limits
      */
+    public List<TileMatrixLimits> getLimits() {
+        return limits;
+    }
+    /**
+     * @param limits the limits to set
+     */
+    public void setLimits(List<TileMatrixLimits> limits) {
+        this.limits = limits;
+    }
+    /**
+     * This is replaced by gt-xsd-wmts
+     */
+    @Deprecated
     private void extractKVPTileMatrixSet() {
         HttpClient client = new HttpClient();
         HttpMethod method = new GetMethod(getBaseUrl());
@@ -330,6 +348,7 @@ public class WMTSService extends TileService {
     /**
      * @param layer
      */
+    @Deprecated
     private void getWGS84Bounds(Element layer) {
         Node wgsbbox = layer.getElementsByTagNameNS(OWS, "WGS84BoundingBox").item(0);
         NodeList bbox = wgsbbox.getChildNodes();
@@ -351,6 +370,7 @@ public class WMTSService extends TileService {
     /**
      * Extract the scales, bbox etc from capabilities.
      */
+    @Deprecated
     private void extractRestTileMatrixSet() {
 
         HttpClient client = new HttpClient();
@@ -474,7 +494,6 @@ public class WMTSService extends TileService {
      * @return
      */
     public String getFormat() {
-        // TODO Auto-generated method stub
         return format;
     }
     /**

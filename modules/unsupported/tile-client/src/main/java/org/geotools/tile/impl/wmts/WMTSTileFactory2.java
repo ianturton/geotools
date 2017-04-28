@@ -21,9 +21,7 @@ import java.util.logging.Logger;
 import org.geotools.tile.Tile;
 import org.geotools.tile.TileFactory;
 import org.geotools.tile.TileService;
-import org.geotools.tile.impl.WebMercatorTileService;
 import org.geotools.tile.impl.ZoomLevel;
-import org.geotools.tile.impl.osm.OSMTileFactory;
 import org.geotools.util.logging.Logging;
 
 /**
@@ -32,36 +30,49 @@ import org.geotools.util.logging.Logging;
  * @author ian
  *
  */
-public class WMTSTileFactory extends TileFactory {
+public class WMTSTileFactory2 extends TileFactory {
     private static final Logger LOGGER = Logging
-            .getLogger(WMTSTileFactory.class.getPackage().getName());
+            .getLogger(WMTSTileFactory2.class.getPackage().getName());
 
     /**
      * 
      */
-    public WMTSTileFactory() {
+    public WMTSTileFactory2() {
         // TODO Auto-generated constructor stub
     }
 
     @Override
     public Tile findTileAtCoordinate(double lon, double lat, ZoomLevel zoomLevel,
             TileService service) {
+        WMTSZoomLevel zl = (WMTSZoomLevel) zoomLevel;
+        TileMatrix tileMatrix = ((WMTSService) service).getMatrixSet().getMatrices()
+                .get(zl.getZoomLevel());
+        TileMatrixLimits tileMatrixLimits = ((WMTSService) service).getLimits()
+                .get(zl.getZoomLevel());
+        long matrixWidth = (tileMatrixLimits.getMaxcol() - tileMatrixLimits.getMincol());
+        long matrixHeight = (tileMatrixLimits.getMaxrow() - tileMatrixLimits.getMinrow());
+        double tileSpanY = (tileMatrix.getTileHeight() * tileMatrix.getResolution());
+        double tileSpanX = (tileMatrix.getTileWidth() * tileMatrix.getResolution());
+        double tileMatrixMinX = tileMatrix.getTopLeft().getX();
+        double tileMatrixMaxY = tileMatrix.getTopLeft().getY();
+        // to compensate for floating point computation inaccuracies
+        double epsilon = 1e-6;
+        long xTile = (int) Math.floor((lon - tileMatrixMinX) / tileSpanX + epsilon);
+        long yTile = (int) Math.floor((tileMatrixMaxY -(90.0 - lat)) / tileSpanY + epsilon);
+        // to avoid requesting out-of-range tiles
+        if (xTile < 0)
+            xTile = 0;
+        if (xTile >= matrixWidth)
+            xTile = matrixWidth - 1;
+        if (yTile < 0)
+            yTile = 0;
+        if (yTile >= matrixHeight)
+            yTile = matrixHeight - 1;
 
-        lat = TileFactory.normalizeDegreeValue(lat, 90);
-        lon = TileFactory.normalizeDegreeValue(lon, 180);
-        lat = OSMTileFactory.moveInRange(lat, WebMercatorTileService.MIN_LATITUDE,
-                WebMercatorTileService.MAX_LATITUDE);
-        int i = 1 << zoomLevel.getZoomLevel(); // 2 to the power zoom
-        int xTile = (int) Math.floor((lon + 180) / 360 * i);
-        double a = lat * Math.PI / 180; // latitude in rads
-
-        int yTile = (int) Math
-                .floor((1 - Math.log(Math.tan(a) + 1 / Math.cos(a)) / Math.PI) / 2 * i);
-        
         LOGGER.fine("fetching tile: " + xTile + " " + yTile + " " + zoomLevel.getZoomLevel());
-        if(yTile<0) yTile = 0;
-        if(xTile<0) xTile = 0;
-        return new WMTSTile(xTile, yTile, zoomLevel, service);
+        System.out.println("tile at " + lat + "," + lon + " is z:" + zoomLevel + " x:" + xTile
+                + " y:" + yTile);
+        return new WMTSTile((int) xTile, (int) yTile, zoomLevel, service);
     }
 
     @Override

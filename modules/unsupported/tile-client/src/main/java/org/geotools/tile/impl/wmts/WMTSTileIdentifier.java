@@ -36,7 +36,7 @@ public class WMTSTileIdentifier extends TileIdentifier {
      */
     public WMTSTileIdentifier(int x, int y, ZoomLevel zoomLevel, String serviceName) {
         super(x, y, zoomLevel, serviceName);
-        // TODO Auto-generated constructor stub
+        
     }
 
     @Override

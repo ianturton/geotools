@@ -18,34 +18,26 @@ package org.geotools.data.wmts;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.ServiceInfo;
 import org.geotools.data.ows.AbstractOpenWebService;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.HTTPClient;
-import org.geotools.data.ows.HTTPResponse;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
-import org.geotools.data.wmts.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wmts.request.GetTileRequest;
-import org.geotools.data.wmts.response.GetFeatureInfoResponse;
-import org.geotools.data.wmts.response.GetTileResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
 import org.geotools.tile.Tile;
 import org.geotools.tile.impl.wmts.WMTSServiceType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author ian

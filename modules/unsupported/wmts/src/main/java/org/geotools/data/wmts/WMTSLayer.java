@@ -18,10 +18,13 @@ package org.geotools.data.wmts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.ows.Layer;
+import org.geotools.tile.impl.wmts.TileMatrixSetLink;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author ian
@@ -101,5 +104,12 @@ public class WMTSLayer extends Layer{
        
         return templates.get(key);
     }
-
+    
+    public void addSRS(CoordinateReferenceSystem crs) {
+        if(srs==null) {
+            srs = new HashSet<>();
+        }
+        srs.addAll(extractCRSNames(crs));
+    }
+    
 }

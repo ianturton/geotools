@@ -227,10 +227,10 @@ public class WebMapTileServerOnlineTest extends OnlineTestCase {
         assertNotNull(envelope);
         // <ows:LowerCorner>-134.731422 24.955967</ows:LowerCorner>
         // <ows:UpperCorner>-66.969849 49.371735</ows:UpperCorner>
-        assertEquals(-124.731422, envelope.getMinimum(0), 0.0001);
-        assertEquals(24.955967, envelope.getMinimum(1), 0.0001);
-        assertEquals(-66.969849, envelope.getMaximum(0), 0.0001);
-        assertEquals(49.371735, envelope.getMaximum(1), 0.0001);
+        assertEquals(-124.731422, envelope.getMinimum(1), 0.0001);
+        assertEquals(24.955967, envelope.getMinimum(0), 0.0001);
+        assertEquals(-66.969849, envelope.getMaximum(1), 0.0001);
+        assertEquals(49.371735, envelope.getMaximum(0), 0.0001);
 
 /*        crs = CRS.decode("EPSG:42304");
         envelope = wms.getEnvelope(layer, crs);

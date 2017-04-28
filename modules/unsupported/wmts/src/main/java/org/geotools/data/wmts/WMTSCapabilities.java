@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +32,16 @@ import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Capabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.tile.impl.wmts.TileMatrix;
+import org.geotools.tile.impl.wmts.TileMatrixLimits;
 import org.geotools.tile.impl.wmts.TileMatrixSet;
+import org.geotools.tile.impl.wmts.TileMatrixSetLink;
 import org.geotools.tile.impl.wmts.WMTSServiceType;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -139,12 +147,24 @@ public class WMTSCapabilities extends Capabilities {
                 WGS84BoundingBoxType wgsBBox = (WGS84BoundingBoxType) layerType
                         .getWGS84BoundingBox().get(0);
                 if (wgsBBox != null) {
-                    boundingBoxes.put("EPSG:4326",
-                            new CRSEnvelope("EPSG:4326",
-                                    ((Double) wgsBBox.getLowerCorner().get(0)).doubleValue(),
-                                    ((Double) wgsBBox.getLowerCorner().get(1)).doubleValue(),
-                                    ((Double) wgsBBox.getUpperCorner().get(0)).doubleValue(),
-                                    ((Double) wgsBBox.getUpperCorner().get(1)).doubleValue()));
+                    // WGS84 is in lon,lat order - https://portal.opengeospatial.org/services/srv_public_issues.php?call=viewIssue&issue_id=898
+                    if (DefaultGeographicCRS.WGS84.getAxis(0).getDirection()
+                            .equals(AxisDirection.NORTH)) {
+                        boundingBoxes.put("EPSG:4326",
+                                new CRSEnvelope("EPSG:4326",
+                                        ((Double) wgsBBox.getLowerCorner().get(0)).doubleValue(),
+                                        ((Double) wgsBBox.getLowerCorner().get(1)).doubleValue(),
+                                        ((Double) wgsBBox.getUpperCorner().get(0)).doubleValue(),
+                                        ((Double) wgsBBox.getUpperCorner().get(1)).doubleValue()));
+                    } else {
+                        boundingBoxes.put("EPSG:4326",
+                                new CRSEnvelope("EPSG:4326",
+                                        ((Double) wgsBBox.getLowerCorner().get(1)).doubleValue(),
+                                        ((Double) wgsBBox.getLowerCorner().get(0)).doubleValue(),
+                                        ((Double) wgsBBox.getUpperCorner().get(1)).doubleValue(),
+                                        ((Double) wgsBBox.getUpperCorner().get(0)).doubleValue()));
+                    }
+
                 }
                 layer.setBoundingBoxes(boundingBoxes);
 
@@ -153,9 +173,9 @@ public class WMTSCapabilities extends Capabilities {
                     for (URLTemplateType resource : resourceURL) {
                         String template = resourceURL.get(0).getTemplate();
                         String format = resourceURL.get(0).getFormat();
-                        //layer.formats.add(format);
-                        
-                        layer.putResourceURL(format,template);
+                        // layer.formats.add(format);
+
+                        layer.putResourceURL(format, template);
                     }
 
                 }
@@ -189,12 +209,22 @@ public class WMTSCapabilities extends Capabilities {
 
         // set layer SRS
         Set<String> srs = new TreeSet<>();
+        Set<CoordinateReferenceSystem> crs = new HashSet<>();
         for (TileMatrixSet tms : matrixes) {
+
+            try {
+                crs.add(tms.getCoordinateReferenceSystem());
+            } catch (FactoryException e) {
+                //LOGGER.log(Level.FINER, e.getMessage(), e);
+            }
 
             srs.add(tms.getCrs());
         }
         for (Layer l : layers) {
-            l.setSrs(srs);
+            // l.setSrs(srs);
+            for (CoordinateReferenceSystem c : crs) {
+                ((WMTSLayer) l).addSRS(c);
+            }
         }
 
         request = new WMTSRequest();
