@@ -112,7 +112,7 @@ public class WebMapTileServerOnlineTest extends OnlineTestCase {
         request.addLayer(layer, "_null");
 
         Set<String> srss = WMTSUtils.getSRSs(capabilities);
-       
+        assertNotNull(srss);
         request.setSRS("EPSG:4326");
         request.setDimensions("800", "400");
 

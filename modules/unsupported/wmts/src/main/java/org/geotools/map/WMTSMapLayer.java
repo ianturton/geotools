@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
@@ -50,12 +51,15 @@ import org.opengis.referencing.operation.MathTransform;
  * choosing which style to use
  * 
  * @author Andrea Aime - OpenGeo
+ * @author Ian Turton
  *
  *
  * @source $URL$
  */
 public class WMTSMapLayer extends GridReaderLayer {
-
+    /** The logger for the map module. */
+    static public final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.map");
     /**
      * The default raster style
      */
@@ -108,7 +112,7 @@ public class WMTSMapLayer extends GridReaderLayer {
     public String getFeatureInfoAsText(DirectPosition2D pos, int featureCount) throws IOException {
         BufferedReader br = null;
         try {
-            GetTileRequest mapRequest = getReader().mapRequest;
+            GetTileRequest mapRequest = getReader().getMapRequest();
             InputStream is = getReader().getFeatureInfo(pos, "text/plain", featureCount, mapRequest);
             br = new BufferedReader(new InputStreamReader(is));
             String line;
@@ -140,7 +144,7 @@ public class WMTSMapLayer extends GridReaderLayer {
      */
     public InputStream getFeatureInfo(DirectPosition2D pos, String infoFormat, int featureCount)
             throws IOException {
-        GetTileRequest mapRequest = getReader().mapRequest;
+        GetTileRequest mapRequest = getReader().getMapRequest();
         return getReader().getFeatureInfo(pos, infoFormat, featureCount, mapRequest);
     }
 
@@ -169,7 +173,7 @@ public class WMTSMapLayer extends GridReaderLayer {
             DirectPosition2D toPos = new DirectPosition2D();
             MathTransform mt = CRS.findMathTransform(bbox.getCoordinateReferenceSystem(), getReader().requestCRS, true);
             mt.transform(fromPos, toPos);
-            GetTileRequest mapRequest = getReader().mapRequest;
+            GetTileRequest mapRequest = getReader().getMapRequest();
             return getReader().getFeatureInfo(toPos, infoFormat, featureCount, mapRequest);
         } catch(IOException e) {
             throw e;
@@ -204,7 +208,7 @@ public class WMTSMapLayer extends GridReaderLayer {
      * @return
      */
     public GetTileRequest getLastGetMap() {
-        return getReader().mapRequest;
+        return getReader().getMapRequest();
     }
 
     /**

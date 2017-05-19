@@ -108,6 +108,7 @@ public class TileMatrixSet {
     /**
      * @param e
      */
+    @Deprecated
     public static TileMatrixSet parseTileMatrixSet(Element e) {
         TileMatrixSet ret = new TileMatrixSet();
         NodeList crs = e.getElementsByTagNameNS(OWS, "SupportedCRS");
@@ -118,6 +119,12 @@ public class TileMatrixSet {
 
         for (int i = 0; i < matices.getLength(); i++) {
             TileMatrix tm = TileMatrix.parse((Element) matices.item(i));
+            try {
+                tm.setCrs(ret.getCoordinateReferenceSystem());
+            } catch (FactoryException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             ret.addMatrix(tm);
         }
 

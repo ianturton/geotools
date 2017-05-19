@@ -27,8 +27,6 @@
   <artifactId>gt-efeature</artifactId>
   <packaging>jar</packaging>
   <name>EFeature DataStore Implementation</name>
-  <version>18-SNAPSHOT</version>
-  
   <description>
     The EFeature DataStore module adds support for spatial read and write operations to EMF models. 
   </description>
@@ -76,17 +74,17 @@
       <dependency>
         <groupId>org.eclipse.emf</groupId>
         <artifactId>edit</artifactId>
-        <version>2.3.0-v200706262000</version>
+        
       </dependency>
       <dependency>
         <groupId>org.eclipse.emf</groupId>
         <artifactId>query</artifactId>
-        <version>1.2.100-v200903190031!</version>
+       
       </dependency>
       <dependency>
         <groupId>org.eclipse.equinox</groupId>
         <artifactId>app</artifactId>
-        <version>1.0.0-v20070606</version>
+       
       </dependency>
       <!-- dependency>
         <groupId>org.eclipse.emf</groupId>
@@ -138,9 +136,8 @@
     <!-- Eclipse -->        
     <dependency>
         <groupId>org.eclipse.xsd</groupId>
-        <artifactId>xsd</artifactId>
-        <version>2.6.0</version>
-        <scope>compile</scope>
+        <artifactId>org.eclipse.emf.xsd</artifactId>
+        <version>2.12.0</version>
     </dependency>
     <!-- EMF -->        
     <dependency>
@@ -151,8 +148,7 @@
     <dependency>
         <groupId>org.eclipse.emf</groupId>
         <artifactId>ecore</artifactId>
-        <version>2.6.1</version>
-        <scope>compile</scope>
+        <version>2.12.0</version>
     </dependency>
     <dependency>
         <groupId>org.eclipse.emf</groupId>

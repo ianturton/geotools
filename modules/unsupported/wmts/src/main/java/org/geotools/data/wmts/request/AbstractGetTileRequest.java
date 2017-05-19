@@ -16,7 +16,6 @@
  */
 package org.geotools.data.wmts.request;
 
-import java.awt.Dimension;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -37,19 +36,12 @@ import org.geotools.data.ows.StyleImpl;
 import org.geotools.data.wms.request.AbstractGetMapRequest;
 import org.geotools.data.wmts.WMTSCapabilities;
 import org.geotools.data.wmts.WMTSLayer;
-import org.geotools.factory.GeoTools;
-import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.CRS.AxisOrder;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.tile.Tile;
 import org.geotools.tile.TileService;
-import org.geotools.tile.impl.ScaleZoomLevelMatcher;
-import org.geotools.tile.impl.ZoomLevel;
-import org.geotools.tile.impl.wmts.TileMatrix;
 import org.geotools.tile.impl.wmts.TileMatrixLimits;
 import org.geotools.tile.impl.wmts.TileMatrixSet;
 import org.geotools.tile.impl.wmts.TileMatrixSetLink;
@@ -60,7 +52,6 @@ import org.geotools.util.logging.Logging;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.operation.TransformException;
@@ -200,16 +191,19 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
         TileMatrixSet matrixSet = null;
         Map<String, TileMatrixSetLink> links = layer.getTileMatrixLinks();
         CoordinateReferenceSystem requestCRS = getCrs();
+        LOGGER.fine("request CRS "+requestCRS);
         if (requestCRS == null) {
             try {
+                LOGGER.fine("request CRS decoding"+srs);
                 requestCRS = CRS.decode(srs);
-                System.out.println("Request CRS: " + requestCRS);
+                
 
             } catch (FactoryException e) {
                 LOGGER.log(Level.FINER, e.getMessage(), e);
                 throw new RuntimeException(e);
             }
         }
+        /*System.out.println(requestCRS);*/
         for (TileMatrixSet matrix : capabilities.getMatrixes()) {
 
             CoordinateReferenceSystem coordinateReferenceSystem = null;
@@ -218,11 +212,11 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
             } catch (FactoryException e) {
                 LOGGER.log(Level.FINER, e.getMessage(), e);
             }
-            // System.out.println("comparing "+coordinateReferenceSystem);
+/*            System.out.println("comparing "+coordinateReferenceSystem);*/
             // TODO: possible issues here if axis order is not the same
             if (CRS.equalsIgnoreMetadata(requestCRS, coordinateReferenceSystem)) {// matching SRS
                 if (links.containsKey((matrix.getIdentifier()))) { // and available for this layer
-
+                    LOGGER.fine("selected matrix set:"+matrix.getIdentifier());
                     setProperty(TILEMATRIXSET, matrix.getIdentifier());
                     matrixSet = matrix;
 
@@ -233,9 +227,10 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
 
         if (matrixSet == null) {
             // Just pick one!
+            LOGGER.warning("Failed to match the requested CRS ("+requestCRS.getName()+") with any of the tile matrices!");
             for (TileMatrixSet matrix : capabilities.getMatrixes()) {
                 if (links.containsKey((matrix.getIdentifier()))) { // and available for this layer
-
+                    LOGGER.fine("selected matrix set:"+matrix.getIdentifier());
                     setProperty(TILEMATRIXSET, matrix.getIdentifier());
                     matrixSet = matrix;
 
@@ -247,6 +242,7 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
                         + layer.getName() + " and SRS: " + requestCRS.getName());
             }
         }
+        //System.out.println("selected "+matrixSet.getCrs());
         String requestUrl = onlineResource.toString();
         if (WMTSServiceType.REST.equals(type)) {
             String format = (String) getProperties().get("Format");
@@ -266,8 +262,8 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
         } catch (FactoryException | TransformException ex) {
             throw new RuntimeException("Failed to calculate scale", ex);
         }
-        tiles = wmtsService.findTilesInExtent(bbox, scale, false, 128);
-
+        tiles = ((WMTSService)wmtsService).findTilesInExtent(bbox, scale, false, 128);
+        LOGGER.fine("found "+tiles.size()+" tiles in "+bbox);
         if (tiles.isEmpty()) {
             return tiles;
         }
@@ -285,19 +281,19 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
                 int x = tile.getTileIdentifier().getX();
                 int y = tile.getTileIdentifier().getY();
                 if (x < limit.getMincol() || x > limit.getMaxcol()) {
-                    LOGGER.finest(x + " exceeds col limits " + limit.getMincol() + " "
+                    LOGGER.fine(x + " exceeds col limits " + limit.getMincol() + " "
                             + limit.getMaxcol());
                     remove.add(tile);
                     continue;
                 }
 
                 if (y < limit.getMinrow() || y > limit.getMaxrow()) {
-                    LOGGER.finest(y + " exceeds row limits " + limit.getMinrow() + " "
+                    LOGGER.fine(y + " exceeds row limits " + limit.getMinrow() + " "
                             + limit.getMaxrow());
                     remove.add(tile);
                 }
             }
-            tiles.removeAll(remove);
+            //tiles.removeAll(remove);
         } else {
             // seems that MapProxy (and all REST APIs?) don't create limits
             // so there is nothing we can do here?

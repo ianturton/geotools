@@ -16,14 +16,12 @@
  */
 package org.geotools.tile.impl.wmts;
 
-import static org.junit.Assert.*;
+import java.net.URL;
 
+import org.geotools.test.OnlineTestCase;
 import org.geotools.tile.Tile;
 import org.geotools.tile.TileService;
 import org.geotools.tile.impl.WebMercatorZoomLevel;
-import org.geotools.tile.impl.osm.OSMService;
-import org.geotools.tile.impl.osm.OSMTile;
-import org.geotools.tile.impl.osm.OSMTileIdentifier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,24 +30,21 @@ import org.junit.Test;
  * @author ian
  *
  */
-public class WMTSTileTest {
+public class WMTSTileOnLineTest extends OnlineTestCase {
 
     private Tile restTile;
     private Tile kvpTile;
-
-    @Before
-    public void beforeTest() {
-
-        String baseURL = "http://raspberrypi:9000/wmts/1.0.0/WMTSCapabilities.xml";
-        TileService restService = new WMTSService("states", baseURL,"states","webmercator", WMTSServiceType.REST);
-        String url = "http://raspberrypi:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities";
-        TileService kvpService = new WMTSService("states", url,"topp:states","epsg:900913", WMTSServiceType.KVP);
+    @Override
+    protected void setUpInternal() throws Exception {
+        URL serverURL = new URL(fixture.getProperty("kvp_server"));
+        TileService kvpService = new WMTSService("states", serverURL.toExternalForm(),"topp:states","epsg:900913", WMTSServiceType.KVP);
+        URL restWMTS = new URL(fixture.getProperty("rest_server"));
+        TileService restService = new WMTSService("states", restWMTS.toExternalForm(),"topp:states","epsg4326", WMTSServiceType.REST);
         WMTSTileIdentifier tileIdentifier = new WMTSTileIdentifier(10, 12,
                 new WebMercatorZoomLevel(5), kvpService.getName());
 
         this.restTile = new WMTSTile(tileIdentifier, restService);
         this.kvpTile = new WMTSTile(tileIdentifier, kvpService);
-
     }
 
     @Test
@@ -67,8 +62,14 @@ public class WMTSTileTest {
 
         
         
-        Assert.assertEquals("http://raspberrypi:9000/wmts/states/webmercator/5/10/12.png",
+        Assert.assertEquals("http://raspberrypi:9000/wmts/topp:states/epsg4326/5/10/12.png",
                 this.restTile.getUrl().toString());
+    }
+
+    @Override
+    protected String getFixtureId() {
+    
+        return "wmts";
     }
 
 }

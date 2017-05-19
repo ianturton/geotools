@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import org.eclipse.emf.common.util.EList;
 import org.geotools.data.ows.CRSEnvelope;
@@ -33,6 +34,7 @@ import org.geotools.data.ows.Capabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.AbstractSingleCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.tile.impl.wmts.TileMatrix;
 import org.geotools.tile.impl.wmts.TileMatrixLimits;
@@ -74,6 +76,21 @@ import net.opengis.wmts.v_11.URLTemplateType;
  * @source $URL$
  */
 public class WMTSCapabilities extends Capabilities {
+    
+    
+    static public final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.data.wmts");
+
+    private static CoordinateReferenceSystem CRS84 ;
+    static {
+        try {
+            CRS84 = CRS.decode("CRS:84");
+        } catch (FactoryException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
     private WMTSRequest request;
 
     private GeometryFactory gf = new GeometryFactory();
@@ -147,23 +164,27 @@ public class WMTSCapabilities extends Capabilities {
                 WGS84BoundingBoxType wgsBBox = (WGS84BoundingBoxType) layerType
                         .getWGS84BoundingBox().get(0);
                 if (wgsBBox != null) {
-                    // WGS84 is in lon,lat order - https://portal.opengeospatial.org/services/srv_public_issues.php?call=viewIssue&issue_id=898
-                    if (DefaultGeographicCRS.WGS84.getAxis(0).getDirection()
+                    int y;
+                    int x;
+                    // in WMTS WGS84 is in lon,lat order - https://portal.opengeospatial.org/services/srv_public_issues.php?call=viewIssue&issue_id=898
+                    if (CRS84.getCoordinateSystem().getAxis(0).getDirection()
                             .equals(AxisDirection.NORTH)) {
-                        boundingBoxes.put("EPSG:4326",
-                                new CRSEnvelope("EPSG:4326",
-                                        ((Double) wgsBBox.getLowerCorner().get(0)).doubleValue(),
-                                        ((Double) wgsBBox.getLowerCorner().get(1)).doubleValue(),
-                                        ((Double) wgsBBox.getUpperCorner().get(0)).doubleValue(),
-                                        ((Double) wgsBBox.getUpperCorner().get(1)).doubleValue()));
+                        x = 1;
+                        y = 0;
+                        LOGGER.info("exporting bbox "+wgsBBox+"\n as lat/lon");
                     } else {
-                        boundingBoxes.put("EPSG:4326",
-                                new CRSEnvelope("EPSG:4326",
-                                        ((Double) wgsBBox.getLowerCorner().get(1)).doubleValue(),
-                                        ((Double) wgsBBox.getLowerCorner().get(0)).doubleValue(),
-                                        ((Double) wgsBBox.getUpperCorner().get(1)).doubleValue(),
-                                        ((Double) wgsBBox.getUpperCorner().get(0)).doubleValue()));
+                        x = 0;
+                        y = 1;
+                        LOGGER.info("exporting bbox "+wgsBBox+"\n as lon/lat");
                     }
+                    boundingBoxes.put("CRS:84",
+                            new CRSEnvelope("CRS:84",
+                                    ((Double) wgsBBox.getLowerCorner().get(x)).doubleValue(),
+                                    ((Double) wgsBBox.getLowerCorner().get(y)).doubleValue(),
+                                    ((Double) wgsBBox.getUpperCorner().get(x)).doubleValue(),
+                                    ((Double) wgsBBox.getUpperCorner().get(y)).doubleValue()));
+                    
+                    layer.setLatLonBoundingBox(boundingBoxes.get("CRS:84"));
 
                 }
                 layer.setBoundingBoxes(boundingBoxes);
@@ -198,8 +219,14 @@ public class WMTSCapabilities extends Capabilities {
                 matrix.setMatrixWidth(mat.getMatrixWidth().intValue());
                 matrix.setTileHeight(mat.getTileHeight().intValue());
                 matrix.setTileWidth(mat.getTileWidth().intValue());
+                try {
+                    matrix.setCrs(matrixSet.getCoordinateReferenceSystem());
+                } catch (FactoryException e) {
+                    
+                    throw new RuntimeException("unable to create CRS", e);
+                }
                 List<Double> c = mat.getTopLeftCorner();
-                // TODO: May need to revisit if axis order is an issue
+                
                 matrix.setTopLeft(gf.createPoint(
                         new Coordinate(c.get(0).doubleValue(), c.get(1).doubleValue())));
                 matrixSet.addMatrix(matrix);
@@ -215,7 +242,7 @@ public class WMTSCapabilities extends Capabilities {
             try {
                 crs.add(tms.getCoordinateReferenceSystem());
             } catch (FactoryException e) {
-                //LOGGER.log(Level.FINER, e.getMessage(), e);
+                // LOGGER.log(Level.FINER, e.getMessage(), e);
             }
 
             srs.add(tms.getCrs());
@@ -395,7 +422,6 @@ public class WMTSCapabilities extends Capabilities {
      * @return
      */
     public Layer getLayer(String name) {
-        // TODO Auto-generated method stub
         return layerMap.get(name);
     }
 }

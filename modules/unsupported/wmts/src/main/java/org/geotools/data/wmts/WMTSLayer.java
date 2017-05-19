@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.tile.impl.wmts.TileMatrixSetLink;
@@ -31,6 +32,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  */
 public class WMTSLayer extends Layer{
+    /** The logger for the map module. */
+    static public final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.data.wmts");
     Map<String,TileMatrixSetLink> limits = new HashMap<>();
     List<String> formats = new ArrayList<>();
     List<String> infoFormats = new ArrayList<>();

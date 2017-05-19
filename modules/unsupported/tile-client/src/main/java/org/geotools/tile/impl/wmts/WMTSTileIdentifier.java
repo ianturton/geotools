@@ -62,17 +62,17 @@ public class WMTSTileIdentifier extends TileIdentifier {
 
     @Override
     public TileIdentifier getRightNeighbour() {
-        int maxTilePerRowNumber = getZoomLevel().getMaxTilePerRowNumber();
+        int width = getZoomLevel().getMaxTilePerRowNumber();
         return new WMTSTileIdentifier(
-                TileIdentifier.arithmeticMod((getX() + 1), maxTilePerRowNumber),
+                TileIdentifier.arithmeticMod((getX() + 1), width),
                 getY(), getZoomLevel(), getServiceName());
     }
 
     @Override
     public TileIdentifier getLowerNeighbour() {
-        int maxTilePerRowNumber = getZoomLevel().getMaxTilePerRowNumber();
+        int height = ((WMTSZoomLevel)getZoomLevel()).getMaxTilePerColNumber();
         return new WMTSTileIdentifier(getX(),
-                TileIdentifier.arithmeticMod((getY() + 1), maxTilePerRowNumber),
+                TileIdentifier.arithmeticMod((getY() + 1), height),
                 getZoomLevel(), getServiceName());
     }
 

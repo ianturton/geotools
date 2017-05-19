@@ -134,7 +134,7 @@ public abstract class TileService {
 
         assert (scaleList != null && scaleList.length > 0);
 
-        int zoomLevel = zoomLevelMatcher.getZoomLevelFromScale(this, tempScaleList);
+        int zoomLevel = zoomLevelMatcher.getZoomLevelFromScale(this, scaleList);
 
         // Now apply the scale-factor
         if (zoomLevel == 0) {
@@ -248,7 +248,8 @@ public abstract class TileService {
 
         // TODO understand the minus 1 below
         int zoomLevelA = getZoomLevelToUse(zoomLevelMatcher, scaleFactor, recommendedZoomLevel) - 1;
-
+        if(zoomLevelA<=0)
+            zoomLevelA=0; // this is related to the -1 above!
         ZoomLevel zoomLevel = tileFactory.getZoomLevel(zoomLevelA, this);
 
         long maxNumberOfTilesForZoomLevel = zoomLevel.getMaxTileNumber();
@@ -324,7 +325,7 @@ public abstract class TileService {
         return !(tiles.peek(tileId) == null || tiles.get(tileId) == null);
     }
 
-    private Tile addTileToCache(Tile tile) {
+    protected Tile addTileToCache(Tile tile) {
         if (listContainsTile(tile.getId())) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.fine("Tile already in cache: " + tile.getId());

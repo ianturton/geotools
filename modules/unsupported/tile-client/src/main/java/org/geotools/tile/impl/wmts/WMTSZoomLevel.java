@@ -54,7 +54,7 @@ public class WMTSZoomLevel extends ZoomLevel {
     }
 
     public String toString() {
-        return "ZoomLevel "+getZoomLevel()+":"+getMaxTilePerColNumber() +" cols "+getMaxTilePerRowNumber()+" rows";
+        return "ZoomLevel "+getZoomLevel()+": "+getMaxTilePerColNumber() +" rows "+getMaxTilePerRowNumber()+" cols";
         
     }
 }

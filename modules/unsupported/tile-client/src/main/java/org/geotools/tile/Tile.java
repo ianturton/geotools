@@ -195,8 +195,9 @@ public abstract class Tile implements ImageLoader {
 
             return this.tileImage;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to load image: " + this.getUrl(),
-                    e);
+            //DEBUG
+            /*LOGGER.log(Level.SEVERE, "Failed to load image: " + this.getUrl(),
+                    e);*/
             setRenderState(RenderState.INVALID);
             return createErrorImage("Failed: " + getId());
         }
@@ -437,7 +438,7 @@ public abstract class Tile implements ImageLoader {
     }
 
     public String toString() {
-        return this.getUrl().toString();
+        return this.getId();//this.getUrl().toString();
     }
 
     public abstract URL getUrl();

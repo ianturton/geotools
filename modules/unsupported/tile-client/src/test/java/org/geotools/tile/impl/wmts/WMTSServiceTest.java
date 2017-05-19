@@ -18,11 +18,13 @@ package org.geotools.tile.impl.wmts;
 
 import static org.junit.Assert.*;
 
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.tile.Tile;
 import org.geotools.tile.impl.WebMercatorTileFactory;
 import org.geotools.tile.impl.WebMercatorTileService;
 import org.junit.Before;
@@ -87,6 +89,19 @@ public class WMTSServiceTest {
                     env.getMaximum(1), delta);
             assertEquals(services[i].getName(), expected[i].getMaximum(0),
                     env.getMaximum(0), delta);
+        }
+    }
+    
+    @Test
+    public void testFindTilesInExtent() {
+        ReferencedEnvelope env = new ReferencedEnvelope(-90,-90,-180.0,180.0,DefaultGeographicCRS.WGS84);
+        int million = (int) 1e6;
+        int scales[] = {100*million,25*million,10*million,million,500000};
+         for(int i = 0; i < services.length; i++) {
+            for(int k=0;k<scales.length;k++) {
+                Set<Tile> tiles = services[i].findTilesInExtent(env, scales[k], true, 100);
+                System.out.println(tiles.size());
+            }
         }
     }
 }

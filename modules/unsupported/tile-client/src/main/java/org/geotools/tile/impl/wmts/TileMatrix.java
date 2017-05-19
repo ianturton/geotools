@@ -16,6 +16,10 @@
  */
 package org.geotools.tile.impl.wmts;
 
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -43,7 +47,8 @@ public class TileMatrix {
     int matrixWidth;
 
     int matrixHeight;
-
+    
+    private CoordinateReferenceSystem crs;
     /**
      * @return the identifier
      */
@@ -147,6 +152,7 @@ public class TileMatrix {
         this.matrixHeight = matrixHeight;
     }
 
+    @Deprecated
     public static TileMatrix parse(Element e) {
         TileMatrix ret = new TileMatrix();
         NodeList kids = e.getChildNodes();
@@ -193,7 +199,36 @@ public class TileMatrix {
      * @param doubleValue
      * @param doubleValue2
      */
-    public void setTopLeft(double x, double y) {
-        topLeft = gf.createPoint(new Coordinate(x,y));
+    public void setTopLeft(double lon, double lat) {
+        if(crs!=null) {
+            if (isGeotoolsLongitudeFirstAxisOrderForced()
+                    || crs.getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
+                topLeft = gf.createPoint(new Coordinate(lon,lat));
+            } else {
+                topLeft = gf.createPoint(new Coordinate(lat,lon));
+            }
+            return;
+        }
+        //guess lat/lon?
+        topLeft = gf.createPoint(new Coordinate(lat,lon));
+    }
+
+    /**
+     * @return the crs
+     */
+    public CoordinateReferenceSystem getCrs() {
+        return crs;
+    }
+
+    /**
+     * @param crs the crs to set
+     */
+    public void setCrs(CoordinateReferenceSystem crs) {
+        this.crs = crs;
+    }
+    
+    protected static boolean isGeotoolsLongitudeFirstAxisOrderForced() {
+        return Boolean.getBoolean(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER) ||
+                GeoTools.getDefaultHints().get(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER) == Boolean.TRUE;
     }
 }

@@ -55,7 +55,7 @@ public class WMTSTile extends Tile {
      * @param service
      */
     public WMTSTile(WMTSTileIdentifier tileIdentifier, TileService service) {
-        super(tileIdentifier, WebMercatorTileFactory.getExtentFromTileName(tileIdentifier),
+        super(tileIdentifier, WMTSTileFactory.getExtentFromTileName(tileIdentifier, service),
                 DEFAULT_TILE_SIZE);
         this.service = (WMTSService) service;
         setType(this.service.getType());
