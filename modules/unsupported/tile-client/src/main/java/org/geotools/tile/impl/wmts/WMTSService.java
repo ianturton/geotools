@@ -138,18 +138,17 @@ public class WMTSService extends TileService {
     public Set<Tile> findTilesInExtent(ReferencedEnvelope _mapExtent, int scaleFactor,
             boolean recommendedZoomLevel, int maxNumberOfTiles) {
         Set<Tile> ret = Collections.emptySet();
+        System.out.println("request bbox :"+_mapExtent+" "+_mapExtent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
         ReferencedEnvelope extent = createSafeEnvelopeInTileCRS( _mapExtent ) ;
-
+        System.out.println("fixed bbox :"+extent+" "+extent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
+        
         ReferencedEnvelope coverageEnvelope = getBounds();
+        System.out.println("coverage bbox :"+coverageEnvelope+" "+coverageEnvelope.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
         boolean sameCRS = CRS.equalsIgnoreMetadata(coverageEnvelope.getCoordinateReferenceSystem(),
                 extent.getCoordinateReferenceSystem());
         if (sameCRS) {
             if (!coverageEnvelope.intersects((BoundingBox) extent)) {
-                // DEBUG
-                System.out.println("dataEnv:" + coverageEnvelope + " "
-                        + coverageEnvelope.getCoordinateReferenceSystem());
-                System.out.println(
-                        "req Env:" + extent + " " + extent.getCoordinateReferenceSystem());
+                
                 return ret;
             }
         } else {
@@ -161,9 +160,6 @@ public class WMTSService extends TileService {
                 requestEnvelopeWGS84 = extent.transform(DefaultGeographicCRS.WGS84, true);
 
                 if (!dataEnvelopeWGS84.intersects((BoundingBox) requestEnvelopeWGS84)) {
-                    // DEBUG
-                    System.out.println("dataEnv:" + dataEnvelopeWGS84);
-                    System.out.println("req Env:" + requestEnvelopeWGS84);
                     return ret;
                 }
             } catch (TransformException | FactoryException e) {
@@ -195,8 +191,8 @@ public class WMTSService extends TileService {
                 (int) Math.min(maxNumberOfTiles, maxNumberOfTilesForZoomLevel));
         Tile firstTile;
         // Let's get the first tile which covers the upper-left corner
-        if (TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
-                || extent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0)
+        if (/*TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
+                || */extent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0)
                         .getDirection().equals(AxisDirection.EAST)) {
             firstTile = tileFactory.findTileAtCoordinate(extent.getMinX(), extent.getMaxY(),
                     zoomLevel, this);
@@ -342,8 +338,8 @@ public class WMTSService extends TileService {
             GeographicExtent ex = itr.next();
             if (ex instanceof GeographicBoundingBox) {
                 envelope = new ReferencedEnvelope(projectedTileCrs);
-                if (TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
-                        || projectedTileCrs.getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
+                if (/*TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
+                        || */projectedTileCrs.getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
                     envelope.expandToInclude(
                             new Coordinate(((GeographicBoundingBox) ex).getEastBoundLongitude(),
                                     ((GeographicBoundingBox) ex).getNorthBoundLatitude()));

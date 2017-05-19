@@ -293,7 +293,7 @@ public abstract class AbstractGetTileRequest extends AbstractGetMapRequest
                     remove.add(tile);
                 }
             }
-            //tiles.removeAll(remove);
+            tiles.removeAll(remove);
         } else {
             // seems that MapProxy (and all REST APIs?) don't create limits
             // so there is nothing we can do here?

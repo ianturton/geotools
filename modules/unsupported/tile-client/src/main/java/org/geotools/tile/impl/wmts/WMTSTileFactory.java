@@ -79,8 +79,7 @@ public class WMTSTileFactory extends TileFactory {
         double tileSpanX = (tileMatrix.getTileWidth() * pixelSpan);
         double tileMatrixMinX;
         double tileMatrixMaxY;
-        if (TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
-                || tileMatrix.getCrs().getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
+        if (tileMatrix.getCrs().getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
             tileMatrixMinX = tileMatrix.getTopLeft().getX();
             tileMatrixMaxY = tileMatrix.getTopLeft().getY();
         } else {
@@ -92,10 +91,7 @@ public class WMTSTileFactory extends TileFactory {
         long xTile = (int) Math.floor((lon - tileMatrixMinX) / tileSpanX + epsilon);
         long yTile = (int) Math.floor((tileMatrixMaxY - lat) / tileSpanY + epsilon);
         // to avoid requesting out-of-range tiles
-        //DEBUG
-        System.out.println("xTile: "+xTile+" yTile: "+yTile);
-        System.out.println("cols:"+tileMatrixLimits.mincol+" - "+tileMatrixLimits.maxcol);
-        System.out.println("rows:"+tileMatrixLimits.minrow+" - "+tileMatrixLimits.maxrow);
+
         if (xTile >= tileMatrixLimits.maxcol)
             xTile = tileMatrixLimits.maxcol - 1;
         if (yTile >= tileMatrixLimits.maxrow)
@@ -105,10 +101,8 @@ public class WMTSTileFactory extends TileFactory {
             xTile = tileMatrixLimits.mincol;
         if (yTile < tileMatrixLimits.minrow)
             yTile = tileMatrixLimits.minrow;
-        System.out.println("xTile: "+xTile+" yTile: "+yTile);
+
         LOGGER.fine("fetching tile: " + xTile + " " + yTile + " " + zoomLevel.getZoomLevel());
-        /*System.out.println("tile at " + lat + "," + lon + " is z:" + zoomLevel + " x:" + xTile
-                + " y:" + yTile);*/
         return new WMTSTile((int) xTile, (int) yTile, zoomLevel, service);
     }
 
@@ -150,8 +144,7 @@ public class WMTSTileFactory extends TileFactory {
        
         double tileMatrixMinX;
         double tileMatrixMaxY;
-        boolean longFirst = TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
-                || coordinateSystem.getAxis(0).getDirection().equals(AxisDirection.EAST);
+        boolean longFirst = coordinateSystem.getAxis(0).getDirection().equals(AxisDirection.EAST);
         if (longFirst) {
             tileMatrixMinX = tileMatrix.getTopLeft().getX();
             tileMatrixMaxY = tileMatrix.getTopLeft().getY();

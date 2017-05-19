@@ -324,9 +324,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
         double[] inPoints = new double[4];
         double[] outPoints = new double[4];
-        //DEBUG
-        System.out.println("filling viewport "+viewportExtent+" "+viewportExtent.getCoordinateReferenceSystem().getName());
-        
+              
         for (Tile tile : tiles) {
             ReferencedEnvelope nativeTileEnvelope = tile.getExtent();
 
@@ -342,21 +340,18 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             inPoints[3] = tileEnvViewport.getMinY();
             inPoints[2] = tileEnvViewport.getMaxX();
             inPoints[1] = tileEnvViewport.getMaxY();
-            //DEBUG
-            System.out.print("Drawing "+tile.getId()+ " ");
-            System.out.println(tile.getExtent());
             worldToImageTransform.transform(inPoints, 0, outPoints, 0, 2);
             /*for(int i=0;i<4;i+=2) {
                 System.out.println(inPoints[i]+","+inPoints[i+1]+" to "+outPoints[i]+","+outPoints[i+1]);
             }*/
             renderTile(tile, g2d, outPoints);
-            //DEBUG
+       /*     //DEBUG
             g2d.setColor(Color.RED);
             g2d.drawRect((int) outPoints[0], (int) outPoints[1], (int) Math.ceil(outPoints[2] - outPoints[0]),
                 (int) Math.ceil(outPoints[3] - outPoints[1]));
             int x = (int) outPoints[0]+(int) (Math.ceil(outPoints[2] - outPoints[0])/2);
             int y = (int) outPoints[1]+(int) (Math.ceil(outPoints[3] - outPoints[1])/2);
-            g2d.drawString(tile.getId(), x, y);
+            g2d.drawString(tile.getId(), x, y);*/
         }
 
     }
