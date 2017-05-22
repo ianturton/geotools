@@ -140,10 +140,10 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
     void addLayer(org.geotools.data.ows.Layer layer2) {
         this.layer = (org.geotools.data.wmts.WMTSLayer) layer2;
-
+        
         if (srsName == null) {
             // initialize from first layer
-            for (String srs : layer2.getBoundingBoxes().keySet()) {
+            for (String srs : layer2.getSrs()) {
                 try {
                     // check it's valid, if not we crap out and move to the next
                     CRS.decode(srs);

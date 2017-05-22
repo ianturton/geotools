@@ -33,6 +33,7 @@ import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Capabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.AbstractSingleCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -44,6 +45,7 @@ import org.geotools.tile.impl.wmts.WMTSServiceType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -76,12 +78,11 @@ import net.opengis.wmts.v_11.URLTemplateType;
  * @source $URL$
  */
 public class WMTSCapabilities extends Capabilities {
-    
-    
+
     static public final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.data.wmts");
 
-    private static CoordinateReferenceSystem CRS84 ;
+    private static CoordinateReferenceSystem CRS84;
     static {
         try {
             CRS84 = CRS.decode("CRS:84");
@@ -90,7 +91,7 @@ public class WMTSCapabilities extends Capabilities {
             e.printStackTrace();
         }
     }
-    
+
     private WMTSRequest request;
 
     private GeometryFactory gf = new GeometryFactory();
@@ -146,7 +147,7 @@ public class WMTSCapabilities extends Capabilities {
 
                     }
                     layer.addTileMatrixLink(tms);
-
+                    
                 }
                 layer.getFormats().addAll(layerType.getFormat());
                 layer.getInfoFormats().addAll(layerType.getInfoFormat());
@@ -166,16 +167,16 @@ public class WMTSCapabilities extends Capabilities {
                 if (wgsBBox != null) {
                     int y;
                     int x;
-                    // in WMTS WGS84 is in lon,lat order - https://portal.opengeospatial.org/services/srv_public_issues.php?call=viewIssue&issue_id=898
-                    if (CRS84.getCoordinateSystem().getAxis(0).getDirection()
-                            .equals(AxisDirection.NORTH)) {
+                    // in WMTS WGS84 is in lon,lat order -
+                    // see https://portal.opengeospatial.org/services/srv_public_issues.php?call=viewIssue&issue_id=898
+                    if (CRS.getAxisOrder(CRS84).equals(AxisDirection.NORTH_EAST)) {
                         x = 1;
                         y = 0;
-                        LOGGER.info("exporting bbox "+wgsBBox+"\n as lat/lon");
+                        LOGGER.info("exporting bbox " + wgsBBox + "\n as lat/lon");
                     } else {
                         x = 0;
                         y = 1;
-                        LOGGER.info("exporting bbox "+wgsBBox+"\n as lon/lat");
+                        LOGGER.info("exporting bbox " + wgsBBox + "\n as lon/lat");
                     }
                     boundingBoxes.put("CRS:84",
                             new CRSEnvelope("CRS:84",
@@ -183,7 +184,7 @@ public class WMTSCapabilities extends Capabilities {
                                     ((Double) wgsBBox.getLowerCorner().get(y)).doubleValue(),
                                     ((Double) wgsBBox.getUpperCorner().get(x)).doubleValue(),
                                     ((Double) wgsBBox.getUpperCorner().get(y)).doubleValue()));
-                    
+
                     layer.setLatLonBoundingBox(boundingBoxes.get("CRS:84"));
 
                 }
@@ -220,13 +221,14 @@ public class WMTSCapabilities extends Capabilities {
                 matrix.setTileHeight(mat.getTileHeight().intValue());
                 matrix.setTileWidth(mat.getTileWidth().intValue());
                 try {
-                    matrix.setCrs(matrixSet.getCoordinateReferenceSystem());
+                    CoordinateReferenceSystem coordinateReferenceSystem = matrixSet.getCoordinateReferenceSystem();
+                    matrix.setCrs(coordinateReferenceSystem);
                 } catch (FactoryException e) {
-                    
+
                     throw new RuntimeException("unable to create CRS", e);
                 }
                 List<Double> c = mat.getTopLeftCorner();
-                
+
                 matrix.setTopLeft(gf.createPoint(
                         new Coordinate(c.get(0).doubleValue(), c.get(1).doubleValue())));
                 matrixSet.addMatrix(matrix);
@@ -237,29 +239,48 @@ public class WMTSCapabilities extends Capabilities {
         // set layer SRS
         Set<String> srs = new TreeSet<>();
         Set<CoordinateReferenceSystem> crs = new HashSet<>();
+        Map<String,CoordinateReferenceSystem> names = new HashMap<>();
         for (TileMatrixSet tms : matrixes) {
 
             try {
-                crs.add(tms.getCoordinateReferenceSystem());
+                CoordinateReferenceSystem coordinateReferenceSystem = tms.getCoordinateReferenceSystem();
+                crs.add(coordinateReferenceSystem);
+                names.put(tms.getIdentifier(),coordinateReferenceSystem); 
             } catch (FactoryException e) {
                 // LOGGER.log(Level.FINER, e.getMessage(), e);
             }
 
             srs.add(tms.getCrs());
+            
+            
         }
         for (Layer l : layers) {
-            // l.setSrs(srs);
-            for (CoordinateReferenceSystem c : crs) {
-                ((WMTSLayer) l).addSRS(c);
+            WMTSLayer wmtsLayer = (WMTSLayer) l;
+            Map<String, TileMatrixSetLink> tileMatrixLinks = wmtsLayer.getTileMatrixLinks();
+            ReferencedEnvelope wgs84Env = new ReferencedEnvelope(wmtsLayer.getLatLonBoundingBox());
+            for(TileMatrixSetLink tms:tileMatrixLinks.values()) {
+                CoordinateReferenceSystem tmsCRS = names.get(tms.getIdentifier());
+                wmtsLayer.setPreferredCRS(tmsCRS);
+                //addbbox
+                try {
+                    wmtsLayer.getBoundingBoxes().put(tmsCRS.getName().getCode(), new CRSEnvelope(wgs84Env.transform(tmsCRS, true)));
+                } catch (TransformException | FactoryException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
 
         request = new WMTSRequest();
+        //some REST capabilities don't fill this in but we need it later!
+        OperationType operationType = new OperationType();
+        operationType.setGet(null);
+        request.setGetCapabilities(operationType);
         OperationsMetadataType operationsMetadata = caps.getOperationsMetadata();
         setType(WMTSServiceType.REST);
         if (operationsMetadata != null) {
             for (Object op : operationsMetadata.getOperation()) {
-                OperationType opt = new OperationType();
+                OperationType opt = operationType;
                 net.opengis.ows11.OperationType opx = (net.opengis.ows11.OperationType) op;
 
                 EList dcps = opx.getDCP();

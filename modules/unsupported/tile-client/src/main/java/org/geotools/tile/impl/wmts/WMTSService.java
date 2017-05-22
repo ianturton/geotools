@@ -266,7 +266,16 @@ public class WMTSService extends TileService {
     private ReferencedEnvelope createSafeEnvelopeInTileCRS(ReferencedEnvelope _mapExtent) {
         CoordinateReferenceSystem crs = getProjectedTileCrs();
         try {
-
+            //clip _mapExtent to the domain of availability!
+            ReferencedEnvelope extent = getAcceptableExtent(crs);
+            if(!CRS.equalsIgnoreMetadata(crs, _mapExtent.getCoordinateReferenceSystem())) {
+                extent = extent.transform(_mapExtent.getCoordinateReferenceSystem(), true);
+            } /*else {
+              return _mapExtent;  
+            }*/
+            if(_mapExtent.intersects((Envelope)extent)) {
+                _mapExtent = _mapExtent.intersection(extent);
+            }
             return _mapExtent.transform(crs, true);
 
         } catch (TransformException e) {
@@ -331,15 +340,23 @@ public class WMTSService extends TileService {
         }
         // Look this up from the CRS
         CoordinateReferenceSystem projectedTileCrs = getProjectedTileCrs();
+        return getAcceptableExtent(projectedTileCrs);
+    }
+
+    /**
+     * @param projectedTileCrs
+     * @return
+     */
+    private ReferencedEnvelope getAcceptableExtent(CoordinateReferenceSystem projectedTileCrs) {
         Extent extent = projectedTileCrs.getDomainOfValidity();
         Iterator<? extends GeographicExtent> itr = extent.getGeographicElements().iterator();
         while (itr.hasNext()) {
             //GeographicExtent is always long/lat!
             GeographicExtent ex = itr.next();
             if (ex instanceof GeographicBoundingBox) {
-                envelope = new ReferencedEnvelope(projectedTileCrs);
-                if (/*TileMatrix.isGeotoolsLongitudeFirstAxisOrderForced()
-                        || */projectedTileCrs.getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
+                DefaultGeographicCRS wgs84 = DefaultGeographicCRS.WGS84;
+                envelope = new ReferencedEnvelope(wgs84);
+                if (wgs84.getCoordinateSystem().getAxis(0).getDirection().equals(AxisDirection.EAST)) {
                     envelope.expandToInclude(
                             new Coordinate(((GeographicBoundingBox) ex).getEastBoundLongitude(),
                                     ((GeographicBoundingBox) ex).getNorthBoundLatitude()));

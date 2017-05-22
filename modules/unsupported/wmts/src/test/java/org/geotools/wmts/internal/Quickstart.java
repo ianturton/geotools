@@ -46,9 +46,13 @@ public class Quickstart {
         
         map.getViewport().setCoordinateReferenceSystem(crs);
         map.getViewport().setBounds(env);
+        URL serverURL = new URL("http://astun-desktop:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities");
+        serverURL = new URL("http://raspberrypi:9000/wmts/1.0.0/WMTSCapabilities.xml");
         WebMapTileServer server = new WebMapTileServer(
-                new URL("http://astun-desktop:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities"));
-        WMTSLayer wlayer = (WMTSLayer) server.getCapabilities().getLayer("topp:states");
+                serverURL);
+        String name = "topp:states";
+        name="osm";
+        WMTSLayer wlayer = (WMTSLayer) server.getCapabilities().getLayer(name);
         System.out.println(wlayer.getLatLonBoundingBox());
         WMTSMapLayer mapLayer = new WMTSMapLayer(server, wlayer);
         map.addLayer(mapLayer);

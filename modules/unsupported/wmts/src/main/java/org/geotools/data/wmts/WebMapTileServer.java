@@ -46,7 +46,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class WebMapTileServer extends AbstractOpenWebService<WMTSCapabilities, Layer> {
 
     private WMTSServiceType type;
-
+    
     /**
      * @param serverURL
      * @param httpClient
@@ -90,8 +90,17 @@ public class WebMapTileServer extends AbstractOpenWebService<WMTSCapabilities, L
      * @throws ServiceException 
      */
     public WebMapTileServer(WMTSCapabilities capabilities) throws ServiceException, IOException {
-        super(capabilities.getRequest().getGetCapabilities().getGet());
+        this(capabilities.getRequest().getGetCapabilities().getGet());
         setType(capabilities.getType());
+    }
+
+    /**
+     * @param delegate
+     * @throws IOException 
+     * @throws ServiceException 
+     */
+    public WebMapTileServer(WebMapTileServer delegate) throws ServiceException, IOException {
+        this(delegate.serverURL);
     }
 
     @Override

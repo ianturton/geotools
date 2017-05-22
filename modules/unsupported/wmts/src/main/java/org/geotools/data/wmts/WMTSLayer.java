@@ -39,7 +39,7 @@ public class WMTSLayer extends Layer{
     List<String> formats = new ArrayList<>();
     List<String> infoFormats = new ArrayList<>();
     Map<String, String> templates = new HashMap<>();
-    
+    private CoordinateReferenceSystem preferredCRS = null;
     /**
      * @param title
      */
@@ -114,6 +114,18 @@ public class WMTSLayer extends Layer{
             srs = new HashSet<>();
         }
         srs.addAll(extractCRSNames(crs));
+    }
+    /**
+     * @return the preferredCRS
+     */
+    public CoordinateReferenceSystem getPreferredCRS() {
+        return preferredCRS;
+    }
+    /**
+     * @param preferredCRS the preferredCRS to set
+     */
+    public void setPreferredCRS(CoordinateReferenceSystem preferredCRS) {
+        this.preferredCRS = preferredCRS;
     }
     
 }
