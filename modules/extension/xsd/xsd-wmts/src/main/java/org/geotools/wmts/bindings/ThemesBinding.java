@@ -5,8 +5,8 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractSimpleBinding;
 
-import net.opengis.wmts.v_11.ThemesType;
-import net.opengis.wmts.v_11.wmts11Factory;		
+import net.opengis.wmts.v_1.ThemesType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;		
 
 import javax.xml.namespace.QName;
 
@@ -45,8 +45,8 @@ import javax.xml.namespace.QName;
  */
 public class ThemesBinding extends AbstractSimpleBinding {
 
-	wmts11Factory factory;		
-	public ThemesBinding( wmts11Factory factory ) {
+	wmtsv_1Factory factory;		
+	public ThemesBinding( wmtsv_1Factory factory ) {
 		super();
 		this.factory = factory;
 	}

@@ -5,9 +5,9 @@ import org.geotools.xml.*;
 
 import net.opengis.ows11.BoundingBoxType;
 import net.opengis.ows11.CodeType;
-import net.opengis.wmts.v_11.TileMatrixSetType;
-import net.opengis.wmts.v_11.TileMatrixType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.TileMatrixSetType;
+import net.opengis.wmts.v_1.TileMatrixType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 import java.net.URI;
 import java.util.List;
@@ -79,9 +79,9 @@ import javax.xml.namespace.QName;
  */
 public class TileMatrixSetBinding extends AbstractSimpleBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public TileMatrixSetBinding(wmts11Factory factory) {
+    public TileMatrixSetBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

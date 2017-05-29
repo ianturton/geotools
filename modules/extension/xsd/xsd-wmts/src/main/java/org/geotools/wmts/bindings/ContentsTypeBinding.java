@@ -7,9 +7,9 @@ import org.opengis.metadata.MetaData;
 
 import net.opengis.ows20.DatasetDescriptionSummaryBaseType;
 import net.opengis.ows20.MetadataType;
-import net.opengis.wmts.v_11.ContentsType;
-import net.opengis.wmts.v_11.TileMatrixSetType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.ContentsType;
+import net.opengis.wmts.v_1.TileMatrixSetType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 import java.util.List;
 
@@ -44,9 +44,9 @@ import javax.xml.namespace.QName;
  */
 public class ContentsTypeBinding extends AbstractComplexBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public ContentsTypeBinding(wmts11Factory factory) {
+    public ContentsTypeBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

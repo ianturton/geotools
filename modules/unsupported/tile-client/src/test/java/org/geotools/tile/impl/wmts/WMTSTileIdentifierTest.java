@@ -18,13 +18,28 @@ package org.geotools.tile.impl.wmts;
 
 import org.geotools.tile.TileIdentifier;
 import org.geotools.tile.TileIdentifierTest;
-import org.geotools.tile.impl.WebMercatorZoomLevel;
 import org.geotools.tile.impl.ZoomLevel;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class WMTSTileIdentifierTest extends TileIdentifierTest {
-
+    private WMTSService service;
+    @Override
+    protected TileIdentifier createTestTileIdentifier(int z, int x, int y,
+            String name) {
+        if(service==null) {
+            this.setup();
+        }
+        return createTestTileIdentifier(new WMTSZoomLevel(z,service), x, y, name);
+    };
+    @Before
+    public void setup() {
+        String kvpUrl = "http://raspberrypi:8080/geoserver/gwc/service/wmts?REQUEST=GetCapabilities";
+        service = new WMTSService("kvp", kvpUrl, "topp:states", "EPSG:900913",
+                WMTSServiceType.KVP);
+        
+    }
     @Test
     public void testGetId() {
         
@@ -39,7 +54,7 @@ public class WMTSTileIdentifierTest extends TileIdentifierTest {
     @Test
     public void testGetRightNeighbour() {
         WMTSTileIdentifier neighbour = new WMTSTileIdentifier(11, 12,
-                new WebMercatorZoomLevel(5), "SomeService");
+                new WMTSZoomLevel(5,service), "SomeService");
 
         Assert.assertEquals(neighbour, this.tileId.getRightNeighbour());
     }
@@ -47,7 +62,7 @@ public class WMTSTileIdentifierTest extends TileIdentifierTest {
     @Test
     public void testGetLowertNeighbour() {
         WMTSTileIdentifier neighbour = new WMTSTileIdentifier(10, 13,
-                new WebMercatorZoomLevel(5), "SomeService");
+                new WMTSZoomLevel(5,service), "SomeService");
 
         Assert.assertEquals(neighbour, this.tileId.getLowerNeighbour());
     }

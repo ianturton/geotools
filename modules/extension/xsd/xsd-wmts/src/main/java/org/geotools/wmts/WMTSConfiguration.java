@@ -51,7 +51,7 @@ import org.geotools.wmts.bindings._TileMatrixSetLinkBinding;
 import org.geotools.xml.Configuration;
 import org.picocontainer.MutablePicoContainer;
 
-import net.opengis.wmts.v_11.impl.wmts11FactoryImpl;
+import net.opengis.wmts.v_1.impl.wmtsv_1FactoryImpl;
 
 /**
  * Parser configuration for the http://www.opengis.net/wmts/1.0 schema.
@@ -62,7 +62,7 @@ public class WMTSConfiguration extends Configuration {
 
     @Override
     protected void configureContext(MutablePicoContainer context) {
-        context.registerComponentImplementation(wmts11FactoryImpl.class);
+        context.registerComponentImplementation(wmtsv_1FactoryImpl.class);
     }
 
     /**

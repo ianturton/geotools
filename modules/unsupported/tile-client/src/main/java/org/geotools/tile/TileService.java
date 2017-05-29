@@ -134,7 +134,7 @@ public abstract class TileService {
 
         assert (scaleList != null && scaleList.length > 0);
 
-        int zoomLevel = zoomLevelMatcher.getZoomLevelFromScale(this, scaleList);
+        int zoomLevel = zoomLevelMatcher.getZoomLevelFromScale(this, tempScaleList);
 
         // Now apply the scale-factor
         if (zoomLevel == 0) {

@@ -108,8 +108,9 @@ public class WMTSService extends TileService {
         super(name, baseURL);
         setLayerName(layerName);
         setType(type);
-        setTileMatrixSetName(tileMatrixSetName);
         setTemplateURL(baseURL);
+        setTileMatrixSetName(tileMatrixSetName);
+        
 
     }
 
@@ -138,12 +139,12 @@ public class WMTSService extends TileService {
     public Set<Tile> findTilesInExtent(ReferencedEnvelope _mapExtent, int scaleFactor,
             boolean recommendedZoomLevel, int maxNumberOfTiles) {
         Set<Tile> ret = Collections.emptySet();
-        System.out.println("request bbox :"+_mapExtent+" "+_mapExtent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
+        //System.out.println("request bbox :"+_mapExtent+" "+_mapExtent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
         ReferencedEnvelope extent = createSafeEnvelopeInTileCRS( _mapExtent ) ;
-        System.out.println("fixed bbox :"+extent+" "+extent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
+        //System.out.println("fixed bbox :"+extent+" "+extent.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
         
         ReferencedEnvelope coverageEnvelope = getBounds();
-        System.out.println("coverage bbox :"+coverageEnvelope+" "+coverageEnvelope.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
+        //System.out.println("coverage bbox :"+coverageEnvelope+" "+coverageEnvelope.getCoordinateReferenceSystem().getCoordinateSystem().getAxis(0).getDirection());
         boolean sameCRS = CRS.equalsIgnoreMetadata(coverageEnvelope.getCoordinateReferenceSystem(),
                 extent.getCoordinateReferenceSystem());
         if (sameCRS) {
@@ -268,6 +269,7 @@ public class WMTSService extends TileService {
         try {
             //clip _mapExtent to the domain of availability!
             ReferencedEnvelope extent = getAcceptableExtent(crs);
+            crs=extent.getCoordinateReferenceSystem();
             if(!CRS.equalsIgnoreMetadata(crs, _mapExtent.getCoordinateReferenceSystem())) {
                 extent = extent.transform(_mapExtent.getCoordinateReferenceSystem(), true);
             } /*else {
@@ -340,19 +342,20 @@ public class WMTSService extends TileService {
         }
         // Look this up from the CRS
         CoordinateReferenceSystem projectedTileCrs = getProjectedTileCrs();
-        return getAcceptableExtent(projectedTileCrs);
+        return envelope = getAcceptableExtent(projectedTileCrs);
     }
 
     /**
      * @param projectedTileCrs
      * @return
      */
-    private ReferencedEnvelope getAcceptableExtent(CoordinateReferenceSystem projectedTileCrs) {
+   public static ReferencedEnvelope getAcceptableExtent(CoordinateReferenceSystem projectedTileCrs) {
         Extent extent = projectedTileCrs.getDomainOfValidity();
         Iterator<? extends GeographicExtent> itr = extent.getGeographicElements().iterator();
         while (itr.hasNext()) {
             //GeographicExtent is always long/lat!
             GeographicExtent ex = itr.next();
+            ReferencedEnvelope envelope;
             if (ex instanceof GeographicBoundingBox) {
                 DefaultGeographicCRS wgs84 = DefaultGeographicCRS.WGS84;
                 envelope = new ReferencedEnvelope(wgs84);
@@ -448,10 +451,12 @@ public class WMTSService extends TileService {
     private void extractKVPTileMatrixSet() {
         HttpClient client = new HttpClient();
         HttpMethod method = new GetMethod(getBaseUrl());
+        method.setQueryString("REQUEST=GetCapabilities");
         method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
                 new DefaultHttpMethodRetryHandler(3, false));
         try {
             // Execute the method.
+            
             int statusCode = client.executeMethod(method);
 
             if (statusCode != HttpStatus.SC_OK) {

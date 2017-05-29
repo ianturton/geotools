@@ -19,7 +19,7 @@
 	<groupId>org.geotools.xsd</groupId>
 	<artifactId>gt-xsd-wmts</artifactId>
 	<packaging>jar</packaging>
-	<name>OWS XML Support</name>
+	<name>WMTS XML Support</name>
 
 
 
@@ -58,7 +58,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.geotools.ogc</groupId>
-			<artifactId>net.opengis.wmts</artifactId>
+			<artifactId>net.opengis.wmtsv1</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -81,7 +81,7 @@
 				<version>${project.version}</version>
 				<configuration>
 					<schemaLocation>wmts.xsd</schemaLocation>
-					<schemaSourceDirectory>${project.basedir}/src/main/resources/org/geotools/wmts/v1_0/</schemaSourceDirectory>
+					<schemaSourceDirectory>${project.basedir}/src/main/resources/org/geotools/wmts/v_10/</schemaSourceDirectory>
 					<destinationPackage>org.geotools.wmts.bindings</destinationPackage>
 					<generateConfiguration>true</generateConfiguration>
 					<generateBindingInterface>true</generateBindingInterface>
@@ -96,7 +96,7 @@
 					<bindingConstructorArguments>
 						<bindingConstructorArgument>
 							<name>factory</name>
-							<type>net.opengis.wmts.v_11.wmts11Factory</type>
+							<type>net.opengis.wmts.v_10.wmts10Factory</type>
 						</bindingConstructorArgument>
 					</bindingConstructorArguments>
 				</configuration>

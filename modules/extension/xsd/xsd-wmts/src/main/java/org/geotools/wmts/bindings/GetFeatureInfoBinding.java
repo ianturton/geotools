@@ -4,9 +4,9 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractSimpleBinding;
 
-import net.opengis.wmts.v_11.GetFeatureInfoType;
-import net.opengis.wmts.v_11.GetTileType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.GetFeatureInfoType;
+import net.opengis.wmts.v_1.GetTileType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 import java.math.BigInteger;
 
@@ -57,9 +57,9 @@ import javax.xml.namespace.QName;
  */
 public class GetFeatureInfoBinding extends AbstractSimpleBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public GetFeatureInfoBinding(wmts11Factory factory) {
+    public GetFeatureInfoBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

@@ -32,7 +32,7 @@ import org.geotools.xml.Parser;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import net.opengis.wmts.v_11.CapabilitiesType;
+import net.opengis.wmts.v_1.CapabilitiesType;
 
 /**
  * Provides a hook up to parse the capabilties document from inputstream.

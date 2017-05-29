@@ -17,9 +17,7 @@
 package org.geotools.data.wmts;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 
 import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
@@ -27,18 +25,11 @@ import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.HTTPResponse;
 import org.geotools.data.ows.Response;
 import org.geotools.data.ows.Specification;
-import org.geotools.data.ows.StyleImpl;
-import org.geotools.data.wms.WMS1_0_0;
-import org.geotools.data.wms.response.WMSGetCapabilitiesResponse;
 import org.geotools.data.wmts.request.AbstractGetTileRequest;
-import org.geotools.data.wmts.request.GetTileRequest;
 import org.geotools.data.wmts.response.GetTileResponse;
 import org.geotools.data.wmts.response.WMTSGetCapabilitiesResponse;
-import org.geotools.map.WMTSMapLayer;
 import org.geotools.ows.ServiceException;
-import org.geotools.tile.Tile;
 import org.geotools.tile.impl.wmts.WMTSServiceType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author ian

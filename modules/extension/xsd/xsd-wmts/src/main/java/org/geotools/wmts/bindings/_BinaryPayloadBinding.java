@@ -1,13 +1,14 @@
 package org.geotools.wmts.bindings;
 
 
-import org.geotools.wmts.WMTS;
-import org.geotools.xml.*;
-import org.geotools.xml.AbstractComplexBinding;
-
-import net.opengis.wmts.v_11.wmts11Factory;		
-
 import javax.xml.namespace.QName;
+
+import org.geotools.wmts.WMTS;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 /**
  * Binding object for the type http://www.opengis.net/wmts/1.0:_BinaryPayload.
@@ -44,8 +45,8 @@ import javax.xml.namespace.QName;
  */
 public class _BinaryPayloadBinding extends AbstractComplexBinding {
 
-	wmts11Factory factory;		
-	public _BinaryPayloadBinding( wmts11Factory factory ) {
+	wmtsv_1Factory factory;		
+	public _BinaryPayloadBinding( wmtsv_1Factory factory ) {
 		super();
 		this.factory = factory;
 	}

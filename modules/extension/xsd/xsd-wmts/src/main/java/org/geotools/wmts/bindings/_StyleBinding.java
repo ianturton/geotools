@@ -10,9 +10,9 @@ import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
 import net.opengis.ows11.CodeType;
-import net.opengis.wmts.v_11.LegendURLType;
-import net.opengis.wmts.v_11.StyleType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.LegendURLType;
+import net.opengis.wmts.v_1.StyleType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 /**
  * Binding object for the type http://www.opengis.net/wmts/1.0:_Style.
@@ -57,9 +57,9 @@ import net.opengis.wmts.v_11.wmts11Factory;
  */
 public class _StyleBinding extends AbstractComplexBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public _StyleBinding(wmts11Factory factory) {
+    public _StyleBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

@@ -1,22 +1,23 @@
 package org.geotools.wmts.bindings;
 
 
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.geotools.wmts.WMTS;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 import net.opengis.ows11.OnlineResourceType;
 import net.opengis.ows11.OperationsMetadataType;
 import net.opengis.ows11.ServiceIdentificationType;
 import net.opengis.ows11.ServiceProviderType;
-import net.opengis.wmts.v_11.CapabilitiesType;
-import net.opengis.wmts.v_11.ContentsType;
-import net.opengis.wmts.v_11.ThemeType;
-import net.opengis.wmts.v_11.wmts11Factory;
-
-import java.util.List;
-
-import javax.xml.namespace.QName;
+import net.opengis.wmts.v_1.CapabilitiesType;
+import net.opengis.wmts.v_1.ContentsType;
+import net.opengis.wmts.v_1.ThemeType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 /**
  * Binding object for the type http://www.opengis.net/wmts/1.0:_Capabilities.
@@ -68,8 +69,8 @@ import javax.xml.namespace.QName;
  */
 public class _CapabilitiesBinding extends AbstractComplexBinding {
 
-	wmts11Factory factory;		
-	public _CapabilitiesBinding( wmts11Factory factory ) {
+	wmtsv_1Factory factory;		
+	public _CapabilitiesBinding( wmtsv_1Factory factory ) {
 		super();
 		this.factory = factory;
 	}

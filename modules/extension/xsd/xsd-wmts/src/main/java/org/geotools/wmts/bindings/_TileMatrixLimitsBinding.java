@@ -4,8 +4,8 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 
-import net.opengis.wmts.v_11.TileMatrixLimitsType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.TileMatrixLimitsType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 import java.math.BigInteger;
 
@@ -62,9 +62,9 @@ import javax.xml.namespace.QName;
  */
 public class _TileMatrixLimitsBinding extends AbstractComplexBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public _TileMatrixLimitsBinding(wmts11Factory factory) {
+    public _TileMatrixLimitsBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

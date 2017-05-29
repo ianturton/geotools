@@ -81,7 +81,7 @@ public class Layer implements Comparable<Layer> {
      * A set of Strings representing SRSs. These are the SRSs contributed by this layer. For the
      * complete list you need to consider these values and those defined by its parent.
      */
-    protected Set<String> srs = null;
+    protected Set<String> srs = new HashSet<>();
 
     /**
      * The bounding boxes on each layer; usually this matches the actual data coordinate reference

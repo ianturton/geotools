@@ -59,15 +59,15 @@ import net.opengis.ows11.LanguageStringType;
 import net.opengis.ows11.OperationsMetadataType;
 import net.opengis.ows11.RequestMethodType;
 import net.opengis.ows11.ValueType;
-import net.opengis.wmts.v_11.CapabilitiesType;
-import net.opengis.wmts.v_11.ContentsType;
-import net.opengis.wmts.v_11.LayerType;
-import net.opengis.wmts.v_11.TileMatrixLimitsType;
-import net.opengis.wmts.v_11.TileMatrixSetLimitsType;
-import net.opengis.wmts.v_11.TileMatrixSetLinkType;
-import net.opengis.wmts.v_11.TileMatrixSetType;
-import net.opengis.wmts.v_11.TileMatrixType;
-import net.opengis.wmts.v_11.URLTemplateType;
+import net.opengis.wmts.v_1.CapabilitiesType;
+import net.opengis.wmts.v_1.ContentsType;
+import net.opengis.wmts.v_1.LayerType;
+import net.opengis.wmts.v_1.TileMatrixLimitsType;
+import net.opengis.wmts.v_1.TileMatrixSetLimitsType;
+import net.opengis.wmts.v_1.TileMatrixSetLinkType;
+import net.opengis.wmts.v_1.TileMatrixSetType;
+import net.opengis.wmts.v_1.TileMatrixType;
+import net.opengis.wmts.v_1.URLTemplateType;
 
 /**
  * Represents a base object for a WMTS getCapabilities response.
@@ -147,7 +147,7 @@ public class WMTSCapabilities extends Capabilities {
 
                     }
                     layer.addTileMatrixLink(tms);
-                    
+
                 }
                 layer.getFormats().addAll(layerType.getFormat());
                 layer.getInfoFormats().addAll(layerType.getInfoFormat());
@@ -221,7 +221,8 @@ public class WMTSCapabilities extends Capabilities {
                 matrix.setTileHeight(mat.getTileHeight().intValue());
                 matrix.setTileWidth(mat.getTileWidth().intValue());
                 try {
-                    CoordinateReferenceSystem coordinateReferenceSystem = matrixSet.getCoordinateReferenceSystem();
+                    CoordinateReferenceSystem coordinateReferenceSystem = matrixSet
+                            .getCoordinateReferenceSystem();
                     matrix.setCrs(coordinateReferenceSystem);
                 } catch (FactoryException e) {
 
@@ -236,34 +237,39 @@ public class WMTSCapabilities extends Capabilities {
             matrixes.add(matrixSet);
         }
 
-        // set layer SRS
+        // set layer SRS - this comes from the tile matrix link
         Set<String> srs = new TreeSet<>();
         Set<CoordinateReferenceSystem> crs = new HashSet<>();
-        Map<String,CoordinateReferenceSystem> names = new HashMap<>();
+        Map<String, CoordinateReferenceSystem> names = new HashMap<>();
         for (TileMatrixSet tms : matrixes) {
 
             try {
-                CoordinateReferenceSystem coordinateReferenceSystem = tms.getCoordinateReferenceSystem();
+                CoordinateReferenceSystem coordinateReferenceSystem = tms
+                        .getCoordinateReferenceSystem();
                 crs.add(coordinateReferenceSystem);
-                names.put(tms.getIdentifier(),coordinateReferenceSystem); 
+                names.put(tms.getIdentifier(), coordinateReferenceSystem);
             } catch (FactoryException e) {
                 // LOGGER.log(Level.FINER, e.getMessage(), e);
             }
 
             srs.add(tms.getCrs());
-            
-            
         }
         for (Layer l : layers) {
             WMTSLayer wmtsLayer = (WMTSLayer) l;
             Map<String, TileMatrixSetLink> tileMatrixLinks = wmtsLayer.getTileMatrixLinks();
             ReferencedEnvelope wgs84Env = new ReferencedEnvelope(wmtsLayer.getLatLonBoundingBox());
-            for(TileMatrixSetLink tms:tileMatrixLinks.values()) {
+            wmtsLayer.getBoundingBoxes().put("EPSG:4326", new CRSEnvelope(wgs84Env));
+            for (TileMatrixSetLink tms : tileMatrixLinks.values()) {
                 CoordinateReferenceSystem tmsCRS = names.get(tms.getIdentifier());
                 wmtsLayer.setPreferredCRS(tmsCRS);
-                //addbbox
+                // add bboxes
                 try {
-                    wmtsLayer.getBoundingBoxes().put(tmsCRS.getName().getCode(), new CRSEnvelope(wgs84Env.transform(tmsCRS, true)));
+                    // make safe to CRS bounds
+                    ReferencedEnvelope safeEnv = wgs84Env.intersection(
+                            org.geotools.tile.impl.wmts.WMTSService.getAcceptableExtent(tmsCRS));
+                    wmtsLayer.getBoundingBoxes().put(tmsCRS.getName().getCode(),
+                            new CRSEnvelope(safeEnv.transform(tmsCRS, true)));
+                    wmtsLayer.addSRS(tmsCRS);
                 } catch (TransformException | FactoryException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -272,7 +278,7 @@ public class WMTSCapabilities extends Capabilities {
         }
 
         request = new WMTSRequest();
-        //some REST capabilities don't fill this in but we need it later!
+        // some REST capabilities don't fill this in but we need it later!
         OperationType operationType = new OperationType();
         operationType.setGet(null);
         request.setGetCapabilities(operationType);

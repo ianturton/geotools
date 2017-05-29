@@ -13,12 +13,12 @@ import net.opengis.ows11.CodeType;
 import net.opengis.ows11.DatasetDescriptionSummaryBaseType;
 import net.opengis.ows11.MetadataType;
 
-import net.opengis.wmts.v_11.DimensionType;
-import net.opengis.wmts.v_11.LayerType;
-import net.opengis.wmts.v_11.StyleType;
-import net.opengis.wmts.v_11.TileMatrixSetLinkType;
-import net.opengis.wmts.v_11.URLTemplateType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.DimensionType;
+import net.opengis.wmts.v_1.LayerType;
+import net.opengis.wmts.v_1.StyleType;
+import net.opengis.wmts.v_1.TileMatrixSetLinkType;
+import net.opengis.wmts.v_1.URLTemplateType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 /**
  * Binding object for the type http://www.opengis.net/wmts/1.0:LayerType.
@@ -80,9 +80,9 @@ import net.opengis.wmts.v_11.wmts11Factory;
  */
 public class LayerTypeBinding extends AbstractComplexBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public LayerTypeBinding(wmts11Factory factory) {
+    public LayerTypeBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

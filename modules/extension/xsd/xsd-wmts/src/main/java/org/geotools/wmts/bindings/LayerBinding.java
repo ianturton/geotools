@@ -12,12 +12,12 @@ import org.geotools.xml.Node;
 import net.opengis.ows11.CodeType;
 import net.opengis.ows11.DatasetDescriptionSummaryBaseType;
 import net.opengis.ows11.MetadataType;
-import net.opengis.wmts.v_11.DimensionType;
-import net.opengis.wmts.v_11.LayerType;
-import net.opengis.wmts.v_11.StyleType;
-import net.opengis.wmts.v_11.TileMatrixSetLinkType;
-import net.opengis.wmts.v_11.URLTemplateType;
-import net.opengis.wmts.v_11.wmts11Factory;
+import net.opengis.wmts.v_1.DimensionType;
+import net.opengis.wmts.v_1.LayerType;
+import net.opengis.wmts.v_1.StyleType;
+import net.opengis.wmts.v_1.TileMatrixSetLinkType;
+import net.opengis.wmts.v_1.URLTemplateType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
 
 /**
  * Binding object for the element http://www.opengis.net/wmts/1.0:Layer.
@@ -36,9 +36,9 @@ import net.opengis.wmts.v_11.wmts11Factory;
  */
 public class LayerBinding extends AbstractSimpleBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public LayerBinding(wmts11Factory factory) {
+    public LayerBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }
@@ -64,6 +64,7 @@ public class LayerBinding extends AbstractSimpleBinding {
      * 
      * @generated modifiable
      */
+    @SuppressWarnings("unchecked")
     public Object parse(ElementInstance instance, Node node, Object value) throws Exception {
         LayerType layer = factory.createLayerType();
         List<Node> children;

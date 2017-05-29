@@ -143,6 +143,7 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
         
         if (srsName == null) {
             // initialize from first layer
+            
             for (String srs : layer2.getSrs()) {
                 try {
                     // check it's valid, if not we crap out and move to the next
@@ -155,12 +156,12 @@ class WMTSCoverageReader extends AbstractGridCoverage2DReader {
                 }
             }
 
-            if (srsName == null) {
-                if (layer2.getSrs().contains("EPSG:4326")) {
+            if (srsName == null ) {
+                if (layer2.getSrs().isEmpty()||layer2.getSrs().contains("EPSG:4326")) {
                     // otherwise we try 4326
                     srsName = "EPSG:4326";
                     LOGGER.info("defaulting CRS to: "+srsName);
-
+                    layer2.getSrs().add(srsName);
                 } else {
                     // if not even that works we just take the first...
                     srsName = layer2.getSrs().iterator().next();

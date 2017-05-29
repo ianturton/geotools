@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.geotools.data.ows.CRSEnvelope;
-import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.wmts.request.GetTileRequest;
@@ -35,7 +33,7 @@ import org.geotools.xml.Parser;
 import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
-import net.opengis.wmts.v_11.CapabilitiesType;
+import net.opengis.wmts.v_1.CapabilitiesType;
 
 /**
  *
@@ -92,12 +90,12 @@ public class WMTSCapabilitiesTest extends TestCase {
             assertEquals("OML_Foreshore",layers[0].getTitle());
             assertNull(layers[0].getParent());
             assertTrue(layers[0].getSrs().contains("urn:ogc:def:crs:EPSG::4326")); // case should not matter
-            assertTrue(layers[0].getSrs().contains("urn:ogc:def:crs:EPSG::27700"));
+            
             assertEquals("b_road",layers[1].getTitle());
             assertEquals("meridian:b_road", layers[1].getName() );
             assertEquals("b_road_polyline",layers[20].getTitle());
             assertEquals("meridian:b_road_polyline",layers[20].getName());
-            assertEquals(1,layers[0].getBoundingBoxes().size());
+            assertEquals(4,layers[0].getBoundingBoxes().size());
 
             CRSEnvelope bbox = (CRSEnvelope) layers[1].getBoundingBoxes().get("EPSG:4326");
             assertNotNull(bbox);
@@ -118,7 +116,7 @@ public class WMTSCapabilitiesTest extends TestCase {
             GetTileRequest request = wmts.createGetTileRequest();
             assertNotNull(request);
             request.setFormat("image/jpeg");
-            System.out.println(request.getFinalURL().toExternalForm());
+            //System.out.println(request.getFinalURL().toExternalForm());
 
             assertTrue(request.getFinalURL().toExternalForm().indexOf("jpeg") >= 0);
         } catch (java.net.ConnectException ce) {

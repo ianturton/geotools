@@ -4,10 +4,10 @@ import org.geotools.wmts.WMTS;
 import org.geotools.xml.*;
 import org.geotools.xml.AbstractSimpleBinding;
 
-import net.opengis.wmts.v_11.TileMatrixSetLimitsType;
-import net.opengis.wmts.v_11.TileMatrixSetLinkType;
-import net.opengis.wmts.v_11.wmts11Factory;
-import net.opengis.wmts.v_11.impl.TileMatrixSetLinkTypeImpl;
+import net.opengis.wmts.v_1.TileMatrixSetLimitsType;
+import net.opengis.wmts.v_1.TileMatrixSetLinkType;
+import net.opengis.wmts.v_1.wmtsv_1Factory;
+import net.opengis.wmts.v_1.impl.TileMatrixSetLinkTypeImpl;
 
 import javax.xml.namespace.QName;
 
@@ -48,9 +48,9 @@ import javax.xml.namespace.QName;
  */
 public class TileMatrixSetLinkBinding extends AbstractSimpleBinding {
 
-    wmts11Factory factory;
+    wmtsv_1Factory factory;
 
-    public TileMatrixSetLinkBinding(wmts11Factory factory) {
+    public TileMatrixSetLinkBinding(wmtsv_1Factory factory) {
         super();
         this.factory = factory;
     }

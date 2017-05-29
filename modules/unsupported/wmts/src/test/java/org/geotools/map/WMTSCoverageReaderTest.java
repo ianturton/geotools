@@ -83,8 +83,8 @@ public class WMTSCoverageReaderTest {
             mapRequest.setCRS(grid.getCoordinateReferenceSystem());
             Set<Tile> responses = wcr[i].wmts.issueRequest(mapRequest);
             for(Tile t:responses) {
-                System.out.println(t);
-                System.out.println(t.getTileIdentifier()+" "+t.getExtent());
+                //System.out.println(t);
+                //System.out.println(t.getTileIdentifier()+" "+t.getExtent());
             }
             
         }
