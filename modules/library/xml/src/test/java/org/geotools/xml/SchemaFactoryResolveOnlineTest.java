@@ -30,7 +30,7 @@ import org.geotools.data.DataUtilities;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public class SchemaFactoryResolveTest extends TestCase {
+public class SchemaFactoryResolveOnlineTest extends TestCase {
 
     private static File tempFolder = null;
     
@@ -57,30 +57,12 @@ public class SchemaFactoryResolveTest extends TestCase {
         }
     }
 
-
-
-    public void testLocalPathResolve() throws Exception {
+    public void testRemotePathResolve() throws Exception {
         assertNotNull(SchemaFactory.getInstance(
-                URI.create("http://www.w3.org/XML/1998/namespace/test"),
-                URI.create("http://geotools.org/xml/test.xsd")));
+                URI.create("http://www.w3.org/XML/1998/namespace/remote"),
+                URI.create("http://www.w3.org/2001/03/xml.xsd")));
     }
-    
-    public void testCachedPathResolve() throws Exception {
-        File folder = new File(tempFolder + File.separator
-                + "org" + File.separator + "geotools" + File.separator + "xml");
-        assertTrue(folder.mkdirs());
-        
-        copy("/org/geotools/xml/test.xsd", "cached.xsd", folder);
-        copy("/org/geotools/xml/XMLSchema.dtd", "XMLSchema.dtd", folder);
-        copy("/org/geotools/xml/datatypes.dtd", "datatypes.dtd", folder);
-
-        
-        assertNotNull(SchemaFactory.getInstance(
-                URI.create("http://www.w3.org/XML/1998/namespace/cached"),
-                //URI.create("http://geotools.org/xml/cached.xsd")));
-                new File(folder,"cached.xsd").toURI()));
-    }
-    
+   
     private void delete(File f, boolean onlyContent) {
        if(f.isDirectory()) {
            for(File file : f.listFiles()) {
