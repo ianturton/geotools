@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataUtilities;
+
 import org.geotools.util.URLs;
 
 /**
