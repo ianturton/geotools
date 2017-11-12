@@ -301,7 +301,7 @@ public class ParserHandler extends DefaultHandler2 {
     }
     
     public void startDocument() throws SAXException {
-        //perform teh configuration
+        //perform the configuration
         configure(config);
 
         //create the document handler + root context
@@ -551,7 +551,7 @@ O:          for (int i = 0; i < schemas.length; i++) {
             context.registerComponentInstance(index);
             
             //if no default prefix is set in this namespace context, then 
-            // set it to be the namesapce of the configuration
+            // set it to be the namespace of the configuration
             if (namespaces.getURI("") == null) {
                 namespaces.declarePrefix("", config.getNamespaceURI());
             }
@@ -865,11 +865,6 @@ O:          for (int i = 0; i < schemas.length; i++) {
 
         return (XSDSchemaLocationResolver[]) l.toArray(new XSDSchemaLocationResolver[l.size()]);
     }
-
-    
-
-
-
 
     @Override
     public void startCDATA() throws SAXException {
