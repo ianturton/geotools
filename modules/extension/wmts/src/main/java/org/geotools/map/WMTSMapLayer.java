@@ -16,6 +16,7 @@
  */
 package org.geotools.map;
 
+import java.util.Set;
 import java.util.logging.Logger;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wmts.WebMapTileServer;
@@ -124,7 +125,8 @@ public class WMTSMapLayer extends GridReaderLayer {
     public boolean isNativelySupported(CoordinateReferenceSystem crs) {
         try {
             String code = CRS.lookupIdentifier(crs, false);
-            return code != null && getReader().validSRS.contains(code);
+            Set<String> validSRS = getReader().validSRS;
+            return code != null && validSRS.contains(code);
         } catch (Exception t) {
             return false;
         }

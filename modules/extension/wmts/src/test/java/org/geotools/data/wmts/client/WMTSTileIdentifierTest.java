@@ -20,9 +20,9 @@ import static org.geotools.data.wmts.client.WMTSTileFactory4326Test.createCapabi
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import org.geotools.data.wmts.WMTSOnlineTest;
 import org.geotools.data.wmts.model.TileMatrixSet;
 import org.geotools.data.wmts.model.WMTSCapabilities;
 import org.geotools.data.wmts.model.WMTSLayer;
@@ -34,7 +34,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WMTSTileIdentifierTest {
+public class WMTSTileIdentifierTest extends WMTSOnlineTest {
     private WMTSTileService service;
 
     protected TileIdentifier tileId;
@@ -62,22 +62,19 @@ public class WMTSTileIdentifierTest {
         service = createKVPService();
     }
 
-    private WMTSTileService createKVPService() throws Exception {
+    protected WMTSTileService createKVPService() throws Exception {
         try {
-            URL capaKvp = getClass().getClassLoader().getResource("test-data/getcapa_kvp.xml");
+            URL capaKvp = new URL(kvp_baseURL);
             assertNotNull(capaKvp);
-            File capaFile = new File(capaKvp.toURI());
-            WMTSCapabilities capa = createCapabilities(capaFile);
 
-            String baseURL =
-                    "http://demo.geo-solutions.it/geoserver/gwc/service/wmts?REQUEST=getcapabilities";
+            WMTSCapabilities capa = createCapabilities(capaKvp);
 
             WMTSLayer layer = capa.getLayer("spearfish");
             TileMatrixSet matrixSet = capa.getMatrixSet("EPSG:4326");
             assertNotNull(layer);
             assertNotNull(matrixSet);
 
-            return new WMTSTileService(baseURL, WMTSServiceType.KVP, layer, null, matrixSet);
+            return new WMTSTileService(kvp_baseURL, WMTSServiceType.KVP, layer, null, matrixSet);
         } catch (URISyntaxException ex) {
             fail(ex.getMessage());
             return null;

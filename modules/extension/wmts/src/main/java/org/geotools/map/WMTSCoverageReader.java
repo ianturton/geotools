@@ -103,31 +103,37 @@ public class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
         // best guess at the format with a preference for PNG (since it's
         // normally transparent)
-        List<String> formats =
-                ((WMTSLayer) layer)
-                        .getFormats(); // wms2.getCapabilities().getRequest().getGetTile().getFormats();
-        this.format = formats.iterator().next();
-        for (String f : formats) {
-            if ("image/png".equals(f)
-                    || "image/png24".equals(f)
-                    || "png".equals(f)
-                    || "png24".equals(f)
-                    || "image/png; mode=24bit".equals(f)) {
-                this.format = f;
-                break;
+        if (layer != null) {
+            List<String> formats =
+                    ((WMTSLayer) layer)
+                            .getFormats(); // wms2.getCapabilities().getRequest().getGetTile().getFormats();
+
+            this.format = formats.iterator().next();
+            for (String f : formats) {
+                if ("image/png".equals(f)
+                        || "image/png24".equals(f)
+                        || "png".equals(f)
+                        || "png24".equals(f)
+                        || "image/png; mode=24bit".equals(f)) {
+                    this.format = f;
+                    break;
+                }
             }
+        } else {
+            this.format = "image/png";
         }
     }
 
     final void setLayer(org.geotools.data.ows.Layer owsLayer) {
         this.layer = (org.geotools.data.wmts.model.WMTSLayer) owsLayer;
-
-        if (srsName == null) { // initialize from first (unique) layer
+        if (layer == null) return;
+        Set<String> srsSet = owsLayer.getSrs();
+        if (srsName == null && srsSet != null) { // initialize from first (unique) layer
 
             // prefer 4326
             for (String preferred :
                     new String[] {"EPSG:4326", "WGS84", "CRS:84", "WGS 84", "WGS84(DD)"}) {
-                if (owsLayer.getSrs().contains(preferred)) {
+                if (srsSet.contains(preferred)) {
                     srsName = preferred;
                     if (LOGGER.isLoggable(Level.INFO)) LOGGER.info("defaulting CRS to: " + srsName);
                 }
@@ -135,7 +141,7 @@ public class WMTSCoverageReader extends AbstractGridCoverage2DReader {
 
             // no 4326, let's see if the layer is offering something valid
             if (srsName == null) {
-                for (String srs : owsLayer.getSrs()) {
+                for (String srs : srsSet) {
                     try {
                         // check it's valid, if not we crap out and move to the
                         // next
@@ -151,26 +157,26 @@ public class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             }
 
             if (srsName == null) {
-                if (owsLayer.getSrs().isEmpty()) {
+                if (srsSet.isEmpty()) {
                     // force 4326
                     if (LOGGER.isLoggable(Level.INFO))
                         LOGGER.info("adding default CRS to: " + srsName);
                     srsName = "EPSG:4326";
-                    owsLayer.getSrs().add(srsName);
+                    srsSet.add(srsName);
                 } else {
                     // if not even that works we just take the first...
-                    srsName = owsLayer.getSrs().iterator().next();
+                    srsName = srsSet.iterator().next();
                     if (LOGGER.isLoggable(Level.INFO)) LOGGER.info("guessing CRS to: " + srsName);
                 }
             }
 
-            validSRS = owsLayer.getSrs();
+            validSRS = srsSet;
 
         } else {
             LOGGER.severe("TODO: check if this code path is ever run");
 
             Set<String> intersection = new HashSet<>(validSRS);
-            intersection.retainAll(owsLayer.getSrs());
+            intersection.retainAll(srsSet);
 
             // can we reuse what we have?
             if (!intersection.contains(srsName)) {

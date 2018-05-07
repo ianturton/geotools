@@ -73,7 +73,9 @@ public class WMTSLayer extends Layer {
 
     /** @param formats the formats to set */
     public void setFormats(List<String> formats) {
-        this.formats = formats;
+        if (formats != null) {
+            this.formats = formats;
+        }
     }
 
     /** @return the infoFormats */

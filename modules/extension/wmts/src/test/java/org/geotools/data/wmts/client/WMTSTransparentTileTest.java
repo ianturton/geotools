@@ -25,8 +25,11 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
+import org.geotools.data.wmts.WMTSOnlineTest;
 import org.geotools.data.wmts.model.TileMatrixSet;
 import org.geotools.data.wmts.model.WMTSCapabilities;
 import org.geotools.data.wmts.model.WMTSLayer;
@@ -47,7 +50,7 @@ import org.junit.Test;
  * @author Ludovic Pecquot (E-IS) on 21/12/2017.
  * @link {org.geotools.tile.util.TileLayer}
  */
-public class WMTSTransparentTileTest {
+public class WMTSTransparentTileTest extends WMTSOnlineTest {
 
     private WMTSTileService service;
 
@@ -61,17 +64,30 @@ public class WMTSTransparentTileTest {
         service = null;
     }
 
-    private WMTSTileService createKVPService() throws Exception {
+    @Override
+    protected void connect() throws Exception {
+        super.connect();
+        URL test = new URL(geosolutions);
+        URLConnection conn = test.openConnection();
+        InputStream is = conn.getInputStream();
+        if (is == null) {
+            throw new Exception("couldn't connect to " + geosolutions);
+        }
+    }
+
+    protected WMTSTileService createKVPService() throws Exception {
+
         try {
+            // the capabilities returned by geosolutions demo doesn't parse!
             URL capaResource =
                     getClass()
                             .getClassLoader()
                             .getResource("test-data/geosolutions_getcapa_kvp.xml");
             assertNotNull("Can't find KVP getCapa file", capaResource);
             File capaFile = new File(capaResource.toURI());
-            WMTSCapabilities capa = createCapabilities(capaFile);
+            WMTSCapabilities capa = createCapabilities(capaResource);
 
-            String baseURL = "http://demo.geo-solutions.it/geoserver/gwc/service/wmts";
+            String baseURL = geosolutions;
 
             WMTSLayer layer = capa.getLayer("unesco:Unesco_point");
             TileMatrixSet matrixSet = capa.getMatrixSet("EPSG:900913");

@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import net.opengis.wmts.v_1.CapabilitiesType;
@@ -241,7 +240,7 @@ public class WMTSTileFactory4326Test {
             assertNotNull("Can't find REST getCapa resource", capaResource);
             File capaFile = new File(capaResource.toURI());
             assertTrue("Can't find REST getCapa file", capaFile.exists());
-            WMTSCapabilities capa = createCapabilities(capaFile);
+            WMTSCapabilities capa = createCapabilities(capaResource);
 
             String baseURL =
                     "XXXhttp://wmsx.zamg.ac.at/mapcacheStatmap/wmts/1.0.0/WMTSCapabilities.xml";
@@ -265,8 +264,8 @@ public class WMTSTileFactory4326Test {
                             .getClassLoader()
                             .getResource("test-data/geosolutions_getcapa_kvp.xml");
             assertNotNull(capaKvp);
-            File capaFile = new File(capaKvp.toURI());
-            WMTSCapabilities capa = createCapabilities(capaFile);
+            // File capaFile = new File(capaKvp.toURI());
+            WMTSCapabilities capa = createCapabilities(capaKvp);
 
             String baseURL =
                     "http://demo.geo-solutions.it/geoserver/gwc/service/wmts?REQUEST=getcapabilities";
@@ -288,10 +287,10 @@ public class WMTSTileFactory4326Test {
         return new WMTSTileFactory();
     }
 
-    public static WMTSCapabilities createCapabilities(File capFile) throws Exception {
+    public static WMTSCapabilities createCapabilities(URL capFile) throws Exception {
         Parser parser = new Parser(new WMTSConfiguration());
 
-        Object object = parser.parse(new FileReader(capFile));
+        Object object = parser.parse(capFile.openStream());
         assertTrue(
                 "Capabilities failed to parse " + object.getClass(),
                 object instanceof CapabilitiesType);

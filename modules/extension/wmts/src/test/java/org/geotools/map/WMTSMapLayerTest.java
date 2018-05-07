@@ -16,10 +16,16 @@
  */
 package org.geotools.map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import org.geotools.data.wmts.WMTSOnlineTest;
 import org.geotools.data.wmts.WebMapTileServer;
 import org.geotools.data.wmts.model.WMTSLayer;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -27,14 +33,13 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.test.OnlineTestCase;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /** @author ian */
-public class WMTSMapLayerTest extends OnlineTestCase {
+public class WMTSMapLayerTest extends WMTSOnlineTest {
 
     private URL serverURL;
 
@@ -45,13 +50,13 @@ public class WMTSMapLayerTest extends OnlineTestCase {
     private WMTSMapLayer restMapLayer;
 
     @Override
-    protected void setUpInternal() throws Exception {
-        serverURL = new URL(fixture.getProperty("kvp_server"));
+    protected void connect() throws Exception {
+        serverURL = new URL(kvp_baseURL.substring(0, kvp_baseURL.indexOf('?')));
         WebMapTileServer server = new WebMapTileServer(serverURL);
         WMTSLayer wlayer = (WMTSLayer) server.getCapabilities().getLayer("topp:states");
 
         kvpMapLayer = new WMTSMapLayer(server, wlayer);
-        restWMTS = new URL(fixture.getProperty("rest_server"));
+        restWMTS = new URL(rest_baseURL);
         WebMapTileServer server2 = new WebMapTileServer(restWMTS);
         WMTSLayer w2layer = (WMTSLayer) server2.getCapabilities().getLayer("topp:states");
         restMapLayer = new WMTSMapLayer(server2, w2layer);
@@ -78,12 +83,12 @@ public class WMTSMapLayerTest extends OnlineTestCase {
     private void checkEnv(ReferencedEnvelope env) throws FactoryException {
         assertEquals(
                 "wrong CRS",
-                "EPSG:3857",
+                "EPSG:4326",
                 CRS.lookupIdentifier(env.getCoordinateReferenceSystem(), true));
-        assertEquals(env.getMinimum(0), -1.3885038382923e7, 0.001);
-        assertEquals(env.getMinimum(1), 2870337.130793, 0.001);
-        assertEquals(env.getMaximum(0), -7455049.489182421, 0.001);
-        assertEquals(env.getMaximum(1), 6338174.055756185, 0.001);
+        assertEquals(env.getMinimum(0), 24.955967, 0.001);
+        assertEquals(env.getMinimum(1), -134.731422, 0.001);
+        assertEquals(env.getMaximum(0), 49.371735, 0.001);
+        assertEquals(env.getMaximum(1), -66.969849, 0.001);
     }
 
     /**
@@ -93,7 +98,8 @@ public class WMTSMapLayerTest extends OnlineTestCase {
      */
     @Test
     public void testGetCoordinateReferenceSystem() throws FactoryException {
-
+        assertNotNull(kvpMapLayer);
+        assertNotNull(restMapLayer);
         assertEquals(
                 "wrong CRS",
                 "EPSG:3857",
@@ -129,8 +135,9 @@ public class WMTSMapLayerTest extends OnlineTestCase {
      */
     @Test
     public void testIsNativelySupported() throws NoSuchAuthorityCodeException, FactoryException {
-        CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+        CoordinateReferenceSystem crs = CRS.decode("urn:ogc:def:crs:EPSG::3857");
         assertTrue(restMapLayer.isNativelySupported(crs));
+        crs = DefaultGeographicCRS.WGS84;
         assertTrue(kvpMapLayer.isNativelySupported(crs));
         crs = CRS.decode("epsg:3857");
         // Sort out web mercator lookup
@@ -139,10 +146,5 @@ public class WMTSMapLayerTest extends OnlineTestCase {
         crs = CRS.decode("epsg:27700");
         // assertFalse(restMapLayer.isNativelySupported(crs));
         assertFalse(kvpMapLayer.isNativelySupported(crs));
-    }
-
-    @Override
-    protected String getFixtureId() {
-        return "wmts";
     }
 }

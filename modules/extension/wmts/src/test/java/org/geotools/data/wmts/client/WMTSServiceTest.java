@@ -16,25 +16,19 @@
  */
 package org.geotools.data.wmts.client;
 
-import static org.geotools.data.wmts.client.WMTSTileFactory4326Test.createCapabilities;
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geotools.data.wmts.model.TileMatrixSet;
-import org.geotools.data.wmts.model.WMTSCapabilities;
-import org.geotools.data.wmts.model.WMTSLayer;
-import org.geotools.data.wmts.model.WMTSServiceType;
+import org.geotools.data.wmts.WMTSOnlineTest;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.tile.Tile;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -44,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author ian
  * @author Emanuele Tajariol (etj at geo-solutions dot it)
  */
-public class WMTSServiceTest {
+public class WMTSServiceTest extends WMTSOnlineTest {
 
     private WMTSTileService[] services = new WMTSTileService[2];
 
@@ -61,67 +55,15 @@ public class WMTSServiceTest {
         services[0] = createRESTService();
         services[1] = createKVPService();
 
-        _crs[0] = CRS.decode("EPSG:31287");
+        _crs[0] = CRS.decode("urn:ogc:def:crs:EPSG::3857");
         _crs[1] = CRS.decode("EPSG:3857");
-    }
-
-    private WMTSTileService createKVPService() throws Exception {
-        try {
-            URL capaResource =
-                    getClass()
-                            .getClassLoader()
-                            .getResource("test-data/geosolutions_getcapa_kvp.xml");
-            assertNotNull("Can't find KVP getCapa file", capaResource);
-            File capaFile = new File(capaResource.toURI());
-            WMTSCapabilities capa = createCapabilities(capaFile);
-
-            String baseURL =
-                    "http://demo.geo-solutions.it/geoserver/gwc/service/wmts?REQUEST=getcapabilities";
-
-            WMTSLayer layer = capa.getLayer("unesco:Unesco_point");
-            TileMatrixSet matrixSet = capa.getMatrixSet("EPSG:900913");
-            assertNotNull(layer);
-            assertNotNull(matrixSet);
-
-            return new WMTSTileService(baseURL, WMTSServiceType.KVP, layer, null, matrixSet);
-
-        } catch (URISyntaxException ex) {
-            fail(ex.getMessage());
-            return null;
-        }
-    }
-
-    private WMTSTileService createRESTService() throws Exception {
-        try {
-            URL capaResource =
-                    getClass().getClassLoader().getResource("test-data/zamg.getcapa.xml");
-            assertNotNull("Can't find REST getCapa file", capaResource);
-            File capaFile = new File(capaResource.toURI());
-            WMTSCapabilities capa = createCapabilities(capaFile);
-
-            String baseURL =
-                    "http://wmsx.zamg.ac.at/mapcacheStatmap/wmts/1.0.0/WMTSCapabilities.xml";
-            return new WMTSTileService(
-                    baseURL,
-                    WMTSServiceType.REST,
-                    capa.getLayer("grey"),
-                    null,
-                    capa.getMatrixSet("statmap"));
-
-        } catch (URISyntaxException ex) {
-            fail(ex.getMessage());
-            return null;
-        }
     }
 
     @Test
     public void testScales() {
-        // double[][] expected =
-        // {{20,31},{559082264.029,5.590822639508929E8},{1066.36479192,1066.36479192}};
-        // double[][] expected =
-        // {{14,31},{559082264.029,2.925714285714286E7},{1066.36479192,1066.36479192}};
+
         double[][] expected = {
-            {14, 2.925714285714286E7, 3571.4285714285716}, // REST
+            {20, 5.590822640285016e8, 68247.34667369298}, // REST
             {31, 5.590822639508929E8, 68247.34667369298}
         }; // KVP
         double delta = 0.00001;
@@ -146,6 +88,7 @@ public class WMTSServiceTest {
     }
 
     @Test
+    @Ignore("there is no reason to assume the selected layer is in mercator")
     public void testWebMercatorBounds() {
         ReferencedEnvelope[] expected = new ReferencedEnvelope[2];
         expected[0] = new ReferencedEnvelope(0.0, 180.0, -1.0, 0.0, _crs[0]);
