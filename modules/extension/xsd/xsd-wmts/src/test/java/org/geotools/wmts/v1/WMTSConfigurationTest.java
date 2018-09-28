@@ -17,7 +17,7 @@
 package org.geotools.wmts.v1;
 
 import static org.junit.Assert.*;
-
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -27,10 +27,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.opengis.wmts.v_1.CapabilitiesType;
 import net.opengis.wmts.v_1.ContentsType;
 import net.opengis.wmts.v_1.LayerType;
+
 import org.geotools.wmts.WMTSConfiguration;
 import org.geotools.xml.Parser;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -100,5 +102,21 @@ public class WMTSConfigurationTest {
             }
             fail("Document did not validate.");
         }
+    }
+    
+    /**
+     * GEOT-6005 WMTS Capabilities parsing fails for Profile elements.
+     * 
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    @Test
+    public void testGEOT_6004() throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
+      WMTSConfiguration WMTS_CONFIGURATION = new WMTSConfiguration();
+      InputStream inputStream = getClass().getResourceAsStream("wmtsGetCapabilities_response_CRS84.xml");
+      Parser parser = new Parser(WMTS_CONFIGURATION);
+      parser.parse(new InputSource(inputStream));
     }
 }
