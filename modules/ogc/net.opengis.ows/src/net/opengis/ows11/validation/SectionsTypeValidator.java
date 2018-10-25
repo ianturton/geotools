@@ -4,6 +4,8 @@
  */
 package net.opengis.ows11.validation;
 
+import org.eclipse.emf.common.util.EList;
+
 
 
 /**
