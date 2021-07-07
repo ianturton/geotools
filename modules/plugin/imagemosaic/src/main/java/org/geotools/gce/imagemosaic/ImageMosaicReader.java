@@ -313,6 +313,7 @@ public class ImageMosaicReader extends AbstractGridCoverage2DReader
                     String sourceFilePath = sourceFile.getAbsolutePath();
                     if (FilenameUtils.getName(sourceFilePath)
                             .equalsIgnoreCase(Utils.DATASTORE_PROPERTIES)) {
+                        LOGGER.info("found "+sourceFilePath);
                         configuration = Utils.lookForMosaicConfig(sourceURL);
                     } else {
                         throw new DataSourceException(
@@ -326,22 +327,24 @@ public class ImageMosaicReader extends AbstractGridCoverage2DReader
                 // last attempt, do a scan of property files, looking for the mosaic config.
                 if (configuration == null) {
                     // this can be used to look for properties files that do NOT define a datastore
+                    FilenameFilter fileNameFilter = (FilenameFilter)
+                            FileFilterUtils.and(
+                                    FileFilterUtils.notFileFilter(
+                                            FileFilterUtils.nameFileFilter(
+                                                    "indexer.properties")),
+                                    FileFilterUtils.and(
+                                            FileFilterUtils.notFileFilter(
+                                                    FileFilterUtils.nameFileFilter(
+                                                            Utils
+                                                                    .DATASTORE_PROPERTIES)),
+                                            FileFilterUtils.makeFileOnly(
+                                                    FileFilterUtils
+                                                            .suffixFileFilter(
+                                                                    ".properties"))));
+                    LOGGER.info("filenameFilter "+fileNameFilter);
                     final File[] properties =
                             parentDirectory.listFiles(
-                                    (FilenameFilter)
-                                            FileFilterUtils.and(
-                                                    FileFilterUtils.notFileFilter(
-                                                            FileFilterUtils.nameFileFilter(
-                                                                    "indexer.properties")),
-                                                    FileFilterUtils.and(
-                                                            FileFilterUtils.notFileFilter(
-                                                                    FileFilterUtils.nameFileFilter(
-                                                                            Utils
-                                                                                    .DATASTORE_PROPERTIES)),
-                                                            FileFilterUtils.makeFileOnly(
-                                                                    FileFilterUtils
-                                                                            .suffixFileFilter(
-                                                                                    ".properties")))));
+                                    fileNameFilter);
 
                     // Scan for MosaicConfigurationBeans from properties files
                     if (properties != null) {
@@ -1319,9 +1322,12 @@ public class ImageMosaicReader extends AbstractGridCoverage2DReader
     @Override
     public ServiceInfo getInfo() {
         IOFileFilter filesFilter = Utils.MOSAIC_SUPPORT_FILES_FILTER;
+        LOGGER.info("listing files with "+filesFilter );
         Collection<File> files = FileUtils.listFiles(parentDirectory, filesFilter, null);
+        
         List<FileGroup> fileGroups = new ArrayList<>();
         for (File file : files) {
+            LOGGER.info("adding "+file+" to filegroups");
             fileGroups.add(new FileGroup(file, null, null));
         }
         return new DefaultFileServiceInfo(fileGroups);
