@@ -702,27 +702,27 @@ public class NetCDFMosaicReaderTest {
 
             // close the reader and re-open it
             reader.dispose();
-            
+
             // wait a bit, we have to make sure the old indexes are recognized as old
             Thread.sleep(1000);
-            
+
             reader = format.getReader(mosaic);
             source = reader.getGranules("O3", true);
-            
+
             // wait a bit, we have to make sure the old indexes are recognized as old
             Thread.sleep(1000);
 
             // now replace the netcdf file with a more up to date version of the same
             File nc2 = TestData.file(this, "polyphemus_20130301_test_more_times.nc");
             File target = new File(mosaic, "polyphemus_20130301_test.nc");
-            System.out.println("target "+target);
-            if(target.exists()) {
-            	File newFile = new File(target.getAbsoluteFile()+".bak");
-				boolean deleted = target.renameTo(newFile);
-            	System.out.println("renamed? "+deleted);
-            	System.out.println(newFile.getAbsolutePath()+" exists? "+newFile.exists());
+            System.out.println("target " + target);
+            if (target.exists()) {
+                File newFile = new File(target.getAbsoluteFile() + ".bak");
+                boolean deleted = target.renameTo(newFile);
+                System.out.println("renamed? " + deleted);
+                System.out.println(newFile.getAbsolutePath() + " exists? " + newFile.exists());
             }
-            System.out.println("nc2 "+nc2);
+            System.out.println("nc2 " + nc2);
             FileUtils.copyFile(nc2, target, false);
             File fileToHarvest = new File(mosaic, "polyphemus_20130301_test.nc");
             List<HarvestedSource> harvestSummary = reader.harvest(null, fileToHarvest, null);
@@ -735,10 +735,10 @@ public class NetCDFMosaicReaderTest {
             // check that we have four times now
             source = reader.getGranules("O3", true);
             granules = source.getGranules(q);
-            try(SimpleFeatureIterator itr = granules.features()){
-            	while(itr.hasNext()) {
-            		System.out.println(itr.next());
-            	}
+            try (SimpleFeatureIterator itr = granules.features()) {
+                while (itr.hasNext()) {
+                    System.out.println(itr.next());
+                }
             }
             assertEquals(4, granules.size());
             try (SimpleFeatureIterator it = granules.features()) {
