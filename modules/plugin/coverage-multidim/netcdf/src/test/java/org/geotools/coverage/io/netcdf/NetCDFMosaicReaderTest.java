@@ -655,7 +655,7 @@ public class NetCDFMosaicReaderTest {
         // prepare a "mosaic" with just one NetCDF
         File nc1 = TestData.file(this, "polyphemus_20130301_test.nc");
         File mosaic = tempFolder.newFolder("nc_harvest4");
-        FileUtils.copyFileToDirectory(nc1, mosaic);
+        FileUtils.copyFileToDirectory(nc1, mosaic, false);
 
         // The indexer
         String indexer =
@@ -665,7 +665,7 @@ public class NetCDFMosaicReaderTest {
 
         // the datastore.properties file is also mandatory...
         File dsp = TestData.file(this, "datastore.properties");
-        FileUtils.copyFileToDirectory(dsp, mosaic);
+        FileUtils.copyFileToDirectory(dsp, mosaic, false);
 
         // have the reader harvest it
         ImageMosaicFormat format = new ImageMosaicFormat();
@@ -715,15 +715,17 @@ public class NetCDFMosaicReaderTest {
             // now replace the netcdf file with a more up to date version of the same
             File nc2 = TestData.file(this, "polyphemus_20130301_test_more_times.nc");
             File target = new File(mosaic, "polyphemus_20130301_test.nc");
-            System.out.println("target " + target);
             if (target.exists()) {
                 File newFile = new File(target.getAbsoluteFile() + ".bak");
                 boolean deleted = target.renameTo(newFile);
                 System.out.println("renamed? " + deleted);
                 System.out.println(newFile.getAbsolutePath() + " exists? " + newFile.exists());
             }
-            System.out.println("nc2 " + nc2);
+
+            Date now = new Date();
+            nc2.setLastModified(now.getTime());
             FileUtils.copyFile(nc2, target, false);
+
             File fileToHarvest = new File(mosaic, "polyphemus_20130301_test.nc");
             List<HarvestedSource> harvestSummary = reader.harvest(null, fileToHarvest, null);
             assertEquals(1, harvestSummary.size());
@@ -735,11 +737,7 @@ public class NetCDFMosaicReaderTest {
             // check that we have four times now
             source = reader.getGranules("O3", true);
             granules = source.getGranules(q);
-            try (SimpleFeatureIterator itr = granules.features()) {
-                while (itr.hasNext()) {
-                    System.out.println(itr.next());
-                }
-            }
+
             assertEquals(4, granules.size());
             try (SimpleFeatureIterator it = granules.features()) {
                 SimpleFeature f = it.next();
@@ -779,15 +777,15 @@ public class NetCDFMosaicReaderTest {
         File nc1 = TestData.file(this, "2DLatLonCoverage.nc");
         File nc2 = TestData.file(this, "2DLatLonCoverage2.nc");
         File mosaic = tempFolder.newFolder("simpleMosaic");
-        FileUtils.copyFileToDirectory(nc1, mosaic);
-        FileUtils.copyFileToDirectory(nc2, mosaic);
+        FileUtils.copyFileToDirectory(nc1, mosaic, false);
+        FileUtils.copyFileToDirectory(nc2, mosaic, false);
 
         // the datastore.properties file is also mandatory...
         File dsp = TestData.file(this, "datastore.properties");
-        FileUtils.copyFileToDirectory(dsp, mosaic);
+        FileUtils.copyFileToDirectory(dsp, mosaic, false);
 
         File xml = TestData.file(this, "hdf5Coverage2D.xml");
-        FileUtils.copyFileToDirectory(xml, mosaic);
+        FileUtils.copyFileToDirectory(xml, mosaic, false);
 
         // The indexer
         String indexer =
@@ -809,7 +807,7 @@ public class NetCDFMosaicReaderTest {
         // prepare a "mosaic" with just one NetCDF
         File nc1 = TestData.file(this, "polyphemus_20130301_test.nc");
         File mosaic = tempFolder.newFolder("nc_harvest2");
-        FileUtils.copyFileToDirectory(nc1, mosaic);
+        FileUtils.copyFileToDirectory(nc1, mosaic, false);
 
         // The indexer
         String indexer =
@@ -819,7 +817,7 @@ public class NetCDFMosaicReaderTest {
 
         // the datastore.properties file is also mandatory...
         File dsp = TestData.file(this, "datastore.properties");
-        FileUtils.copyFileToDirectory(dsp, mosaic);
+        FileUtils.copyFileToDirectory(dsp, mosaic, false);
 
         // have the reader harvest it
         ImageMosaicFormat format = new ImageMosaicFormat();
@@ -856,7 +854,7 @@ public class NetCDFMosaicReaderTest {
 
             // now add another netcdf and harvest it
             File nc2 = TestData.file(this, "polyphemus_20130301_NO2.nc");
-            FileUtils.copyFileToDirectory(nc2, mosaic);
+            FileUtils.copyFileToDirectory(nc2, mosaic, false);
             File fileToHarvest = new File(mosaic, "polyphemus_20130301_NO2.nc");
             List<HarvestedSource> harvestSummary = reader.harvest(null, fileToHarvest, null);
             assertEquals(1, harvestSummary.size());
