@@ -33,15 +33,15 @@ import org.locationtech.jts.geom.Geometry;
  */
 public class PolygonLabelProcess extends StaticMethodsProcessFactory<PolygonLabelProcess> {
     public PolygonLabelProcess() {
-        super(Text.text("PolygonLabelProcess"), "polygonlabelprocess", PolygonLabelProcess.class);
+        super(Text.text("lab"), "poleofinaccessibility", PolygonLabelProcess.class);
     }
 
     @DescribeProcess(
         title = "Polygon label process",
         description =
-                "Calculate the Pole of accessibility, the most distant interior point in a polygon."
+                "Calculate the Pole of inaccessibility, the most distant interior point in a polygon."
     )
-    @DescribeResult(description = "Pole of accessibility")
+    @DescribeResult(description = "Pole of inaccessibility")
     public static Geometry PolyLabeller(
             @DescribeParameter(name = "polygon", description = "Input polygon") Geometry polygon,
             @DescribeParameter(name = "precision", description = "Tolerance") double tolerance) {

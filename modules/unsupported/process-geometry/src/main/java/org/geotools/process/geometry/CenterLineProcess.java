@@ -32,7 +32,7 @@ public class CenterLineProcess extends StaticMethodsProcessFactory<CenterLinePro
 
     public CenterLineProcess() {
 
-        super(Text.text("geo"), "centerLine", CenterLineProcess.class);
+        super(Text.text("lab"), "centerLine", CenterLineProcess.class);
     }
 
     @DescribeProcess(title = "Center Line", description = "Extract Center Line of a Polygon")
