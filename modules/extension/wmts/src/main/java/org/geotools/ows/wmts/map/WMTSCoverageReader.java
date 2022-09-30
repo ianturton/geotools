@@ -29,8 +29,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
+
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -264,7 +266,7 @@ public class WMTSCoverageReader extends AbstractGridCoverage2DReader {
             AffineTransform at = null;
             ReferencedEnvelope global = null;
             for (Tile tile : responses) {
-
+              LOGGER.fine(tile.getUrl().toString());
                 ReferencedEnvelope extent = tile.getExtent();
                 // ensure the extent has EAST_NORTH axis order because otherwise
                 // RendererUtilities.worldToScreenTransform will produce

@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.http.HTTPClient;
 import org.geotools.http.HTTPClientFinder;
@@ -245,21 +246,17 @@ public abstract class AbstractGetTileRequest extends AbstractWMTSRequest impleme
             throw new ServiceException("GetTiles called with no layer set");
         }
 
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine(
-                    "getTiles:  layer:"
-                            + layer
-                            + " w:"
-                            + requestedWidth
-                            + " x h:"
-                            + requestedHeight);
-        }
+
 
         TileMatrixSet matrixSet = selectMatrixSet();
 
         String templateUrl = createTemplateUrl(matrixSet.getIdentifier());
 
         templateUrl = WMTSHelper.replaceToken(templateUrl, "time", requestedTime);
+        if (LOGGER.isLoggable(Level.FINE)) {
+          LOGGER.fine("getTiles:  layer:" + layer + " w:" + requestedWidth + " x h:" + requestedHeight);
+          LOGGER.fine(templateUrl);
+        }
 
         WMTSTileService wmtsService =
                 new WMTSTileService(templateUrl, layer, matrixSet, this.client);

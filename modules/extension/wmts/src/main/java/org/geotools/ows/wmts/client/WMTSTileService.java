@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.http.HTTPClient;
 import org.geotools.http.HTTPClientFinder;
@@ -361,7 +362,8 @@ public class WMTSTileService extends TileService {
                             + ")");
         }
 
-        ReferencedEnvelope coverageEnvelope = getBounds();
+        ReferencedEnvelope coverageEnvelope = getBounds(); // this is always
+                                                           // lat/lon!
 
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(
