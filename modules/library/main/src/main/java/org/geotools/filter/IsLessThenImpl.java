@@ -23,7 +23,7 @@ import org.opengis.filter.expression.Expression;
 /** @author jdeolive */
 public class IsLessThenImpl extends MultiCompareFilterImpl implements PropertyIsLessThan {
     protected IsLessThenImpl(Expression expression1, Expression expression2) {
-        this(expression1, expression2, false);
+        super(expression1, expression2);
     }
 
     protected IsLessThenImpl(Expression expression1, Expression expression2, boolean matchCase) {

@@ -24,7 +24,7 @@ public class IsLessThenOrEqualToImpl extends MultiCompareFilterImpl
         implements PropertyIsLessThanOrEqualTo {
 
     protected IsLessThenOrEqualToImpl(Expression expression1, Expression expression2) {
-        this(expression1, expression2, false);
+        super(expression1, expression2);
     }
 
     protected IsLessThenOrEqualToImpl(
